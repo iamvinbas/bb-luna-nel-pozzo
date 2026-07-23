@@ -1,0 +1,703 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="La Luna nel Pozzo — appartamento esclusivo a Molfetta, Bari. Prenota direttamente e risparmia. Vivi l'autenticità della Puglia."
+    />
+    <meta
+      name="keywords"
+      content="b&b molfetta, appartamento molfetta, puglia, airbnb molfetta, affitto molfetta bari"
+    />
+    <meta property="og:title" content="La Luna nel Pozzo — Molfetta, Bari" />
+    <meta
+      property="og:description"
+      content="Appartamento esclusivo nel cuore di Molfetta. Prenota direttamente e risparmia sulle commissioni."
+    />
+    <meta property="og:type" content="website" />
+    <title>La Luna nel Pozzo — Molfetta, Bari</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/mobile.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+  </head>
+  <body>
+    <!-- ═══════════════════════════ NAVIGATION ═══════════════════════════ -->
+    <nav class="navbar" id="navbar">
+      <div class="nav-container">
+        <a href="#hero" class="nav-logo">
+          <svg
+            class="nav-trullo"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
+          <span class="logo-text">La Luna nel Pozzo</span>
+        </a>
+        <ul class="nav-links">
+          <li><a href="#about">L'Appartamento</a></li>
+          <li><a href="#features">Comfort</a></li>
+          <li><a href="#gallery">Galleria</a></li>
+          <li><a href="#location">Posizione</a></li>
+          <li><a href="#booking" class="nav-cta">Prenota</a></li>
+        </ul>
+        <button class="hamburger" id="hamburger" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- ═══════════════════════════ HERO ═══════════════════════════════════ -->
+    <section class="hero" id="hero">
+      <div class="hero-bg">
+        <img src="images/hero.jpg" alt="Camera da letto — La Luna nel Pozzo" />
+      </div>
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <p class="hero-location reveal-up">
+          <svg
+            class="hero-trullo"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
+          Molfetta, Bari — Puglia
+        </p>
+        <h1 class="hero-title reveal-up delay-1">
+          La Luna<br /><em>nel Pozzo</em>
+        </h1>
+        <p class="hero-subtitle reveal-up delay-2">
+          Un rifugio autentico nel cuore della Puglia
+        </p>
+        <div class="hero-badges reveal-up delay-3">
+          <span class="badge">👥 Fino a 4 ospiti</span>
+          <span class="badge">🛏 2 Letti</span>
+          <span class="badge">⭐ 5.0</span>
+        </div>
+        <div class="hero-cta reveal-up delay-4">
+          <a href="#booking" class="btn btn-primary">Prenota Direttamente</a>
+          <a href="#about" class="btn btn-ghost">Scopri di più</a>
+        </div>
+      </div>
+      <a href="#about" class="hero-scroll-hint" aria-label="Scorri">
+        <span class="scroll-arrow"></span>
+      </a>
+    </section>
+
+    <!-- ═══════════════════════════ DIRECT BOOKING BANNER ════════════════ -->
+    <section class="banner-direct">
+      <div class="container">
+        <div class="banner-inner">
+          <div class="banner-icon">💰</div>
+          <div class="banner-text">
+            <strong>Prenota direttamente e risparmia</strong>
+            <span
+              >Nessuna commissione Airbnb o Booking — stessa qualità, prezzo
+              migliore</span
+            >
+          </div>
+          <a href="#booking" class="btn btn-primary btn-sm">Contattaci ora</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════ ABOUT ════════════════════════════════ -->
+    <section class="about" id="about">
+      <div class="container">
+        <div class="about-grid">
+          <div class="about-images reveal-left">
+            <div class="about-img-main">
+              <img src="images/about-main.jpg" alt="Cucina e soggiorno — La Luna nel Pozzo" loading="lazy" />
+            </div>
+            <div class="about-img-secondary">
+              <img src="images/about-detail-1.jpg" alt="Camera da letto con luce naturale" loading="lazy" />
+              <img src="images/about-detail-2.jpg" alt="Dettagli bagno con saponi e asciugamani" loading="lazy" />
+            </div>
+          </div>
+          <div class="about-text reveal-right">
+            <span class="section-label">L'Appartamento</span>
+            <h2 class="section-title">
+              Un luogo dove il tempo<br /><em>si ferma</em>
+            </h2>
+            <p>
+              Benvenuti a <strong>La Luna nel Pozzo</strong>, un appartamento
+              dal fascino unico nel cuore storico di Molfetta. Tra le mura
+              antiche e l'odore del mare adriatico, vi aspetta un'esperienza
+              autentica della vita pugliese.
+            </p>
+            <p>
+              L'appartamento è stato curato nei minimi dettagli per offrirvi
+              tutto il comfort moderno senza rinunciare all'atmosfera calda e
+              accogliente di una casa vera.
+            </p>
+            <div class="about-stats">
+              <div class="stat">
+                <span class="stat-num">4</span>
+                <span class="stat-label">Ospiti max</span>
+              </div>
+              <div class="stat">
+                <span class="stat-num">2</span>
+                <span class="stat-label">Letti</span>
+              </div>
+              <div class="stat">
+                <span class="stat-num">1</span>
+                <span class="stat-label">Bagno</span>
+              </div>
+              <div class="stat">
+                <span class="stat-num">40</span>
+                <span class="stat-label">m²</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════ FEATURES / AMENITIES ════════════════ -->
+    <section class="features" id="features">
+      <div class="container">
+        <div class="section-header reveal-up">
+          <span class="section-label">Comfort inclusi</span>
+          <h2 class="section-title">
+            Tutto quello<br /><em>di cui hai bisogno</em>
+          </h2>
+        </div>
+        <div class="features-grid">
+          <div class="feature-card reveal-up">
+            <div class="feature-icon">📶</div>
+            <h3>WiFi veloce</h3>
+            <p>Connessione fibra ad alta velocità in tutto l'appartamento</p>
+          </div>
+          <div class="feature-card reveal-up delay-1">
+            <div class="feature-icon">❄️</div>
+            <h3>Aria condizionata</h3>
+            <p>Climatizzatore in ogni ambiente per massimo comfort</p>
+          </div>
+          <div class="feature-card reveal-up delay-2">
+            <div class="feature-icon">🍳</div>
+            <h3>Cucina attrezzata</h3>
+            <p>Cucina completa con tutti gli elettrodomestici</p>
+          </div>
+          <div class="feature-card reveal-up delay-3">
+            <div class="feature-icon">🧺</div>
+            <h3>Lavatrice</h3>
+            <p>Lavatrice disponibile per soggiorni più lunghi</p>
+          </div>
+          <div class="feature-card reveal-up">
+            <div class="feature-icon">🌊</div>
+            <h3>Vicino al mare</h3>
+            <p>A pochi minuti a piedi dal porto e dal lungomare</p>
+          </div>
+          <div class="feature-card reveal-up delay-1">
+            <div class="feature-icon">🚗</div>
+            <h3>Parcheggio</h3>
+            <p>Possibilità di parcheggio nelle vicinanze</p>
+          </div>
+          <div class="feature-card reveal-up delay-2">
+            <div class="feature-icon">☕</div>
+            <h3>Kit benvenuto</h3>
+            <p>Caffè, tè e prodotti tipici pugliesi all'arrivo</p>
+          </div>
+          <div class="feature-card reveal-up delay-3">
+            <div class="feature-icon">🏠</div>
+            <h3>Check-in flessibile</h3>
+            <p>Orari di check-in personalizzabili su richiesta</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════ GALLERY ══════════════════════════════ -->
+    <section class="gallery" id="gallery">
+      <div class="container">
+        <div class="section-header reveal-up">
+          <span class="section-label">Galleria</span>
+          <h2 class="section-title">Esplora<br /><em>ogni angolo</em></h2>
+        </div>
+      </div>
+      <div class="gallery-grid">
+        <div class="gallery-item gallery-item-large reveal-up" data-index="0">
+          <img src="images/gallery-1.jpg" alt="Camera da letto — La Luna nel Pozzo" loading="lazy" />
+          <div class="gallery-overlay"><span>Camera da letto</span></div>
+        </div>
+        <div class="gallery-item reveal-up delay-1" data-index="1">
+          <img src="images/gallery-2.jpg" alt="Cucina con balcone" loading="lazy" />
+          <div class="gallery-overlay"><span>Cucina</span></div>
+        </div>
+        <div class="gallery-item reveal-up delay-2" data-index="2">
+          <img src="images/gallery-3.jpg" alt="Soggiorno con soffitto a volta e balcone" loading="lazy" />
+          <div class="gallery-overlay"><span>Soggiorno</span></div>
+        </div>
+        <div class="gallery-item reveal-up delay-1" data-index="3">
+          <img src="images/gallery-4.jpg" alt="Bagno con specchio e lavabo" loading="lazy" />
+          <div class="gallery-overlay"><span>Bagno</span></div>
+        </div>
+        <div
+          class="gallery-item gallery-item-large reveal-up delay-2"
+          data-index="4"
+        >
+          <img src="images/gallery-5.jpg" alt="Letto con quadro di muschio e luci calde" loading="lazy" />
+          <div class="gallery-overlay"><span>Atmosfera</span></div>
+        </div>
+        <div class="gallery-item reveal-up delay-3" data-index="5">
+          <img src="images/gallery-6.jpg" alt="Quadro di muschio decorativo con lampada dorata" loading="lazy" />
+          <div class="gallery-overlay"><span>Decorazioni</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════ CITY — MOLFETTA ════════════════════ -->
+    <section class="city" id="city">
+      <div class="container">
+        <div class="city-header reveal-up">
+          <span class="section-label">Molfetta, Puglia</span>
+          <h2 class="section-title">La città<br /><em>ti aspetta</em></h2>
+          <p class="section-desc">
+            Porto antico, mare cristallino, centro storico medievale. Molfetta è
+            molto più di una destinazione — è un'emozione.
+          </p>
+        </div>
+
+        <!-- Staggered parallax photos -->
+        <div class="city-photos">
+          <div class="city-photo reveal-up" data-parallax="-0.18">
+            <div class="city-photo-inner">
+              <img
+                src="images/city-puglia-aerial.jpg"
+                alt="Vista aerea della Puglia bianca"
+                loading="lazy"
+                onerror="this.parentElement.classList.add('img-fallback')"
+              />
+            </div>
+            <div class="city-photo-label">
+              <span class="city-photo-num">01</span>
+              <span>La Puglia dall'alto</span>
+            </div>
+          </div>
+          <div
+            class="city-photo city-photo-mid reveal-up delay-1"
+            data-parallax="0.12"
+          >
+            <div class="city-photo-inner">
+              <img
+                src="images/city-adriatic.jpg"
+                alt="Vista aerea del mare adriatico Puglia"
+                loading="lazy"
+                onerror="this.parentElement.classList.add('img-fallback')"
+              />
+            </div>
+            <div class="city-photo-label">
+              <span class="city-photo-num">02</span>
+              <span>L'Adriatico</span>
+            </div>
+          </div>
+          <div class="city-photo reveal-up delay-2" data-parallax="-0.1">
+            <div class="city-photo-inner">
+              <img
+                src="images/city-port-arch.jpg"
+                alt="Arco antico sul porto pugliese"
+                loading="lazy"
+                onerror="this.parentElement.classList.add('img-fallback')"
+              />
+            </div>
+            <div class="city-photo-label">
+              <span class="city-photo-num">03</span>
+              <span>Il Porto Antico</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Infinite horizontal marquee strip — real Molfetta & Puglia photos -->
+      <div class="city-marquee" aria-hidden="true">
+        <div class="marquee-track">
+          <img
+            src="images/molfetta-boats.jpg"
+            alt="Barche colorate al porto di Molfetta"
+            loading="lazy"
+          />
+          <img
+            src="images/molfetta-lighthouse.jpg"
+            alt="Faro di Molfetta"
+            loading="lazy"
+          />
+          <img
+            src="images/molfetta-port.jpg"
+            alt="Porto e faro di Molfetta"
+            loading="lazy"
+          />
+          <img
+            src="images/molfetta-kayak.jpg"
+            alt="Kayak vicino al faro di Molfetta"
+            loading="lazy"
+          />
+          <img
+            src="images/puglia-sea-rocks.jpg"
+            alt="Rocce e mare cristallino in Puglia"
+            loading="lazy"
+          />
+          <img
+            src="images/puglia-vieste.jpg"
+            alt="Vieste, Puglia — città sul mare"
+            loading="lazy"
+          />
+          <img
+            src="images/puglia-old-town.jpg"
+            alt="Centro storico pugliese sul mare"
+            loading="lazy"
+          />
+          <!-- duplicate for seamless loop -->
+          <img src="images/molfetta-boats.jpg" alt="" loading="lazy" />
+          <img src="images/molfetta-lighthouse.jpg" alt="" loading="lazy" />
+          <img src="images/molfetta-port.jpg" alt="" loading="lazy" />
+          <img src="images/molfetta-kayak.jpg" alt="" loading="lazy" />
+          <img src="images/puglia-sea-rocks.jpg" alt="" loading="lazy" />
+          <img src="images/puglia-vieste.jpg" alt="" loading="lazy" />
+          <img src="images/puglia-old-town.jpg" alt="" loading="lazy" />
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════ VIRTUAL TOUR (placeholder) ═══════════ -->
+    <!-- COMMENTATO — da riabilitare quando il tour 360° sarà pronto
+    <section class="virtual-tour" id="virtual-tour">
+      <div class="container">
+        <div class="tour-inner reveal-up">
+          <div class="tour-badge">Prossimamente</div>
+          <h2 class="section-title">Tour Virtuale<br /><em>360°</em></h2>
+          <p>
+            Presto potrai esplorare ogni stanza comodamente da casa tua.<br />Un'esperienza
+            immersiva per vivere l'appartamento prima ancora di arrivare.
+          </p>
+          <div class="tour-preview">
+            <div class="tour-icon">🌐</div>
+            <span>Tour interattivo 360° — disponibile presto</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    -->
+
+    <!-- ═══════════════════════════ LOCATION ════════════════════════════ -->
+    <section class="location" id="location">
+      <div class="container">
+        <div class="location-header reveal-up">
+          <span class="section-label">Dove siamo</span>
+          <h2 class="section-title">Molfetta,<br /><em>Cuore di Puglia</em></h2>
+        </div>
+        <div class="location-chips reveal-up delay-1">
+          <div class="loc-chip">
+            <span class="chip-icon">🏖</span>
+            <div>
+              <strong>Porto e spiagge</strong><span>5 min a piedi</span>
+            </div>
+          </div>
+          <div class="loc-chip">
+            <span class="chip-icon">🍽</span>
+            <div><strong>Ristoranti</strong><span>2 min a piedi</span></div>
+          </div>
+          <div class="loc-chip">
+            <span class="chip-icon">🚂</span>
+            <div><strong>Stazione</strong><span>10 min a piedi</span></div>
+          </div>
+          <div class="loc-chip">
+            <span class="chip-icon">✈️</span>
+            <div><strong>Aeroporto BRI</strong><span>25 min in auto</span></div>
+          </div>
+          <div class="loc-chip">
+            <span class="chip-icon">🌙</span>
+            <div><strong>Centro storico</strong><span>3 min a piedi</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Full-width map — outside container, no text beside -->
+      <div class="location-map-full reveal-up delay-2">
+        <div id="interactive-map"></div>
+        <!-- Airbnb-style floating address card -->
+        <div class="map-float-card">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            class="map-card-moon"
+            aria-hidden="true"
+          >
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
+          <div class="map-card-text">
+            <strong>La Luna nel Pozzo</strong>
+            <span>Via San Giovanni 12 · Molfetta</span>
+          </div>
+          <a
+            href="https://maps.google.com/?q=Via+San+Giovanni+12,+Molfetta,+Bari"
+            target="_blank"
+            rel="noopener"
+            class="map-card-link"
+          >
+            Apri mappa →
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════ BOOKING ══════════════════════════════ -->
+    <section class="booking" id="booking">
+      <div class="container">
+        <div class="section-header reveal-up">
+          <span class="section-label">Prenota direttamente</span>
+          <h2 class="section-title">
+            Contattaci<br /><em>senza intermediari</em>
+          </h2>
+          <p class="section-desc">
+            Scrivi direttamente a noi — risponderemo entro poche ore per
+            confermare disponibilità e prezzo.
+          </p>
+        </div>
+
+        <div class="booking-grid">
+          <!-- Contact cards -->
+          <div class="contact-cards reveal-left">
+            <a
+              href="https://wa.me/393299866890?text=Ciao!%20Vorrei%20informazioni%20su%20La%20Luna%20nel%20Pozzo%20a%20Molfetta."
+              class="contact-card contact-whatsapp"
+              target="_blank"
+              rel="noopener"
+            >
+              <div class="contact-icon">💬</div>
+              <div class="contact-info">
+                <strong>WhatsApp</strong>
+                <span>Risposta rapida — solitamente entro 1 ora</span>
+              </div>
+              <span class="contact-arrow">→</span>
+            </a>
+            <a
+              href="mailto:lalunanelpozzo.molfetta@gmail.com?subject=Prenotazione%20La%20Luna%20nel%20Pozzo&body=Ciao!%20Vorrei%20prenotare%20l'appartamento%20per%20le%20seguenti%20date%3A%0A%0AData%20arrivo%3A%0AData%20partenza%3A%0ANumero%20ospiti%3A%0A%0AGrazie!"
+              class="contact-card contact-email"
+              target="_blank"
+              rel="noopener"
+            >
+              <div class="contact-icon">✉️</div>
+              <div class="contact-info">
+                <strong>Email</strong>
+                <span>lalunanelpozzo.molfetta@gmail.com</span>
+              </div>
+              <span class="contact-arrow">→</span>
+            </a>
+
+            <!-- Calendly — DISABLED, enable when ready -->
+            <div
+              class="contact-card contact-calendly disabled"
+              title="Disponibile presto"
+            >
+              <div class="contact-icon">📅</div>
+              <div class="contact-info">
+                <strong>Calendario disponibilità</strong>
+                <span>Integrazione in arrivo — prossimamente</span>
+              </div>
+              <span class="coming-soon-tag">Presto</span>
+            </div>
+
+            <!-- Payment — DISABLED, enable when ready -->
+            <div
+              class="contact-card contact-payment disabled"
+              title="Disponibile presto"
+            >
+              <div class="contact-icon">💳</div>
+              <div class="contact-info">
+                <strong>Pagamento online</strong>
+                <span>Pagamento sicuro — prossimamente</span>
+              </div>
+              <span class="coming-soon-tag">Presto</span>
+            </div>
+          </div>
+
+          <!-- Inquiry form -->
+          <div class="booking-form reveal-right">
+            <h3>Richiesta di disponibilità</h3>
+            <form id="inquiry-form" novalidate>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="name">Nome</label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="Mario Rossi"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="guests">Ospiti</label>
+                  <select id="guests" name="guests">
+                    <option value="1">1 ospite</option>
+                    <option value="2" selected>2 ospiti</option>
+                    <option value="3">3 ospiti</option>
+                    <option value="4">4 ospiti</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="checkin">Arrivo</label>
+                  <input type="date" id="checkin" name="checkin" required />
+                </div>
+                <div class="form-group">
+                  <label for="checkout">Partenza</label>
+                  <input type="date" id="checkout" name="checkout" required />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  placeholder="mario@email.com"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="message">Messaggio (opzionale)</label>
+                <textarea
+                  id="message"
+                  name="message"
+                  rows="3"
+                  placeholder="Qualcosa che vuoi dirci..."
+                ></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary btn-full">
+                Invia richiesta via WhatsApp
+              </button>
+              <p class="form-note">
+                Il messaggio verrà aperto in WhatsApp con tutti i dettagli già
+                compilati.
+              </p>
+            </form>
+          </div>
+        </div>
+
+        <!-- Also available on platforms -->
+        <div class="platforms reveal-up">
+          <p>Ci trovi anche su:</p>
+          <div class="platform-links">
+            <a
+              href="https://www.airbnb.it/rooms/1734864830277819884"
+              target="_blank"
+              rel="noopener"
+              class="platform-link"
+            >
+              🏠 Airbnb
+            </a>
+            <a
+              href="https://www.booking.com/hotel/it/la-luna-nel-pozzo-molfetta.it.html"
+              target="_blank"
+              rel="noopener"
+              class="platform-link"
+            >
+              🌐 Booking.com
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════ FOOTER ═══════════════════════════════ -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-brand">
+            <div class="footer-brand-name">
+              <svg
+                class="footer-trullo"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+              </svg>
+              <p class="footer-name">La Luna nel Pozzo</p>
+            </div>
+            <p class="footer-location">Molfetta, Bari — Puglia, Italia</p>
+          </div>
+          <div class="footer-links">
+            <h4>Navigazione</h4>
+            <ul>
+              <li><a href="#about">L'Appartamento</a></li>
+              <li><a href="#features">Comfort</a></li>
+              <li><a href="#gallery">Galleria</a></li>
+              <li><a href="#location">Posizione</a></li>
+              <li><a href="#booking">Prenota</a></li>
+            </ul>
+          </div>
+          <div class="footer-contact">
+            <h4>Contatti</h4>
+            <ul>
+              <li>
+                <a
+                  href="https://wa.me/393299866890"
+                  target="_blank"
+                  rel="noopener"
+                  >💬 WhatsApp</a
+                >
+              </li>
+              <li>
+                <a href="mailto:lalunanelpozzo.molfetta@gmail.com">✉️ Email</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>
+            © 2025 La Luna nel Pozzo — Molfetta, Bari. Tutti i diritti
+            riservati.
+          </p>
+          <p class="footer-note">
+            Prenota direttamente e risparmia sulle commissioni.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Lightbox overlay for gallery -->
+    <div
+      class="lightbox"
+      id="lightbox"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Galleria immagini"
+    >
+      <button class="lightbox-close" id="lightbox-close" aria-label="Chiudi">
+        ✕
+      </button>
+      <button class="lightbox-prev" id="lightbox-prev" aria-label="Precedente">
+        ‹
+      </button>
+      <button class="lightbox-next" id="lightbox-next" aria-label="Successivo">
+        ›
+      </button>
+      <div class="lightbox-content" id="lightbox-content"></div>
+      <p class="lightbox-caption" id="lightbox-caption"></p>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>
