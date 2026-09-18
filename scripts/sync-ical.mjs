@@ -32,7 +32,10 @@ const CONFIG = {
   // appartenere a due ospiti diversi.
   checkinFrom: '15:00',
   checkoutBy: '11:00',
-  horizonDays: 540, // 18 mesi di calendario pubblicato
+  // 12 mesi: è la finestra che Airbnb e Booking esportano davvero. Oltre, i
+  // feed semplicemente tacciono — e "nessun evento" non significa "libero",
+  // significa "non lo sappiamo". Pubblicare quei mesi come liberi sarebbe falso.
+  horizonDays: 365,
   siteOrigin: process.env.SITE_ORIGIN || 'https://lalunanelpozzo.it',
   sources: [
     { id: 'airbnb', label: 'Airbnb', url: process.env.ICAL_AIRBNB },

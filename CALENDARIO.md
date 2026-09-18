@@ -118,7 +118,7 @@ In `scripts/sync-ical.mjs`, oggetto `CONFIG`:
 | Campo | Default | Cosa fa |
 |---|---|---|
 | `minNights` | `2` | soggiorno minimo imposto dal calendario e dal modulo |
-| `horizonDays` | `540` | giorni di calendario pubblicati (18 mesi) |
+| `horizonDays` | `365` | giorni di calendario pubblicati (12 mesi: la finestra che le OTA esportano davvero) |
 | `checkinFrom` | `15:00` | orario di arrivo mostrato sul sito e nella richiesta |
 | `checkoutBy` | `11:00` | orario di partenza |
 
@@ -138,6 +138,7 @@ La frequenza di aggiornamento è il `cron` in `.github/workflows/sync-calendar.y
 | Workflow rosso con "sovrapposizione" | Overbooking reale tra Airbnb e Booking | Apri le due extranet e cancella una delle due prenotazioni |
 | Workflow rosso con "URL iCal non configurato" | Secret mancante o rinominato | Ricontrolla il punto (c) |
 | Date vecchie sul sito | Il cron di GitHub può ritardare | Normale fino a ~2h; per forzare, Run workflow |
+| Mesi lontani tutti occupati | Airbnb esporta come "non disponibile" tutto ciò che cade oltre la tua finestra di prenotazione | Airbnb → Calendario → Disponibilità → **Preavviso e finestra di prenotazione** → allarga la finestra (es. 12 mesi) |
 
 Per provare in locale senza toccare i segreti:
 
