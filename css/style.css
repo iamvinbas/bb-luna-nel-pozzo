@@ -1009,6 +1009,217 @@ ul { list-style: none; }
   flex-shrink: 0;
 }
 
+.contact-calendar:not(.disabled):hover { border-color: var(--gold); }
+
+/* ── AVAILABILITY CALENDAR ──────────────────────────── */
+.availability {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-lg);
+  padding: 2rem 2.2rem 1.6rem;
+  margin-bottom: 3rem;
+}
+
+.availability-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  margin-bottom: 1.6rem;
+}
+
+.availability-title h3 {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--white);
+}
+
+.availability-sub {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.5);
+}
+
+.cal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.6);
+}
+
+.cal-legend li { display: flex; align-items: center; gap: 0.45rem; }
+
+.cal-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.cal-dot-free   { background: rgba(201,168,76,0.55); }
+.cal-dot-booked { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.18); }
+
+.cal {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cal-months {
+  display: flex;
+  gap: 2.5rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.cal-month { flex: 1; min-width: 0; }
+
+.cal-nav {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: transparent;
+  color: var(--white);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.cal-nav:hover:not(:disabled) { background: var(--gold); border-color: var(--gold); color: var(--navy); }
+.cal-nav:disabled { opacity: 0.22; cursor: default; }
+
+.cal-month-name {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  color: var(--white);
+  text-align: center;
+  margin-bottom: 0.9rem;
+}
+
+.cal-weekdays,
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+
+.cal-weekdays {
+  margin-bottom: 0.4rem;
+}
+
+.cal-weekdays span {
+  text-align: center;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.35);
+}
+
+.cal-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 8px;
+  /* Oro = disponibile. Scala: libero (tenue) → in arco (medio) → estremi (pieno) */
+  background: rgba(201,168,76,0.18);
+  color: rgba(255,255,255,0.92);
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+
+.cal-day:hover:not(:disabled) { background: rgba(201,168,76,0.5); }
+
+.cal-day.is-past {
+  background: transparent;
+  color: rgba(255,255,255,0.16);
+  cursor: default;
+}
+
+/* Notte occupata */
+.cal-day.is-booked {
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.3);
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+
+/* Una notte occupata resta cliccabile se è una partenza valida: si vende la
+   notte, non la giornata — chi arriva entra alle 15:00, tu esci entro le 11:00 */
+.cal-day:not(:disabled) { cursor: pointer; }
+
+.cal-day.is-in-range {
+  background: rgba(201,168,76,0.42);
+  color: var(--white);
+}
+
+.cal-day.is-start,
+.cal-day.is-end {
+  background: var(--gold);
+  color: var(--navy);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.cal-day:focus-visible {
+  outline: 2px solid var(--gold-light);
+  outline-offset: 2px;
+}
+
+.cal-status {
+  margin-top: 1.4rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.7);
+  text-align: center;
+}
+
+.cal-hours {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem 1.4rem;
+  margin-top: 0.8rem;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.45);
+}
+
+.cal-hours li { display: flex; align-items: center; gap: 0.5rem; }
+
+/* Separatore fra le voci, non prima della prima */
+.cal-hours li + li::before {
+  content: '';
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  margin-right: 0.9rem;
+}
+
+.cal-hours strong { color: rgba(255,255,255,0.75); font-weight: 600; }
+
+.cal-status strong { color: var(--gold); }
+.cal-status a { color: var(--gold); text-decoration: underline; }
+.cal-status.is-warn { color: var(--gold-light); }
+
+.cal-loading .cal { opacity: 0.35; pointer-events: none; }
+.cal-loading .cal-day { color: transparent; }
+
+.cal-unavailable .cal,
+.cal-unavailable .cal-legend,
+.cal-unavailable .cal-hours,
+.cal-unavailable .availability-sub { display: none; }
+
 /* Booking form */
 .booking-form {
   background: rgba(255,255,255,0.06);

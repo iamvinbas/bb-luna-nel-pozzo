@@ -122,14 +122,22 @@ form.addEventListener('submit', e => {
     return;
   }
 
+  // Ultimo controllo contro il calendario sincronizzato: evita che una
+  // richiesta parta per date già occupate su Airbnb o Booking.com.
+  const avail = window.LunaAvailability?.check(checkin, checkout);
+  if (avail && !avail.ok) {
+    showFormError(avail.reason, 8000);
+    return;
+  }
+
   const nights = Math.ceil((new Date(checkout) - new Date(checkin)) / 86400000);
   const fmt = d => new Date(d).toLocaleDateString('it-IT', { day:'2-digit', month:'long', year:'numeric' });
 
   const waText = encodeURIComponent(
     `Ciao! Vorrei prenotare *La Luna nel Pozzo* a Molfetta 🌙\n\n` +
     `👤 Nome: ${name}\n` +
-    `📅 Arrivo: ${fmt(checkin)}\n` +
-    `📅 Partenza: ${fmt(checkout)}\n` +
+    `📅 Arrivo: ${fmt(checkin)} (dalle 15:00)\n` +
+    `📅 Partenza: ${fmt(checkout)} (entro le 11:00)\n` +
     `🌙 Notti: ${nights}\n` +
     `👥 Ospiti: ${guests}\n` +
     `✉️ Email: ${email}` +
@@ -141,7 +149,8 @@ form.addEventListener('submit', e => {
   window.open(`https://wa.me/${waNumber}?text=${waText}`, '_blank');
 });
 
-function showFormError(msg) {
+let formErrorTimer;
+function showFormError(msg, duration = 3500) {
   let err = form.querySelector('.form-error');
   if (!err) {
     err = document.createElement('p');
@@ -150,7 +159,8 @@ function showFormError(msg) {
     form.prepend(err);
   }
   err.textContent = msg;
-  setTimeout(() => err.remove(), 3500);
+  clearTimeout(formErrorTimer);
+  formErrorTimer = setTimeout(() => err.remove(), duration);
 }
 
 /* ── CITY PHOTO PARALLAX ────────────────────────────── */

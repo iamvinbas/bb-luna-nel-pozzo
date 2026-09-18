@@ -1,0 +1,74 @@
+name: Sincronizza calendario
+
+on:
+  schedule:
+    # Ogni 2 ore. GitHub Actions può ritardare l'esecuzione di qualche minuto.
+    - cron: '17 */2 * * *'
+  workflow_dispatch: # esecuzione manuale dalla tab Actions
+  push:
+    branches: [master]
+    paths:
+      - 'data/direct-bookings.json'
+      - 'scripts/sync-ical.mjs'
+      - '.github/workflows/sync-calendar.yml'
+
+concurrency:
+  group: sync-calendar
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Scarica e unisci i calendari
+        id: sync
+        continue-on-error: true # exit 2 = conflitto: il file è comunque scritto
+        # shell esplicita: attiva pipefail, senza il quale il `tee` in coda
+        # mascherebbe l'uscita non-zero dello script e l'allarme non scatterebbe
+        shell: bash
+        env:
+          ICAL_AIRBNB: ${{ secrets.ICAL_AIRBNB }}
+          ICAL_BOOKING: ${{ secrets.ICAL_BOOKING }}
+          SITE_ORIGIN: ${{ vars.SITE_ORIGIN || 'https://iamvinbas.github.io' }}
+        run: node scripts/sync-ical.mjs 2>&1 | tee "$RUNNER_TEMP/sync.log"
+
+      - name: Commit se cambiato
+        run: |
+          git config user.name  "calendar-sync[bot]"
+          git config user.email "calendar-sync@users.noreply.github.com"
+          # -A e non i due path: se lo script è uscito in errore i file possono
+          # non esistere, e `git add <path inesistente>` fallirebbe il job
+          git add -A data calendar
+          if git diff --staged --quiet; then
+            echo "Nessuna variazione di disponibilità."
+          else
+            git commit -m "chore(calendar): aggiorna disponibilità da Airbnb e Booking"
+            git push
+          fi
+
+      - name: Riepilogo
+        if: always()
+        run: |
+          {
+            echo '## Sincronizzazione calendario'
+            echo '```'
+            cat "$RUNNER_TEMP/sync.log" 2>/dev/null || echo 'nessun log'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # Il run fallisce solo se lo script è uscito in errore, così arriva la
+      # notifica email di GitHub in caso di sovrapposizione tra piattaforme.
+      - name: Segnala errori o sovrapposizioni
+        if: steps.sync.outcome == 'failure'
+        run: |
+          echo "::error::Sincronizzazione con problemi o sovrapposizione di prenotazioni — controlla il log."
+          exit 1

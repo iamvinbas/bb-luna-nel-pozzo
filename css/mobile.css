@@ -105,6 +105,18 @@
 
   /* ── Booking */
   .booking-grid { grid-template-columns: 1fr; }
+
+  /* ── Calendario disponibilità: un mese, celle più toccabili */
+  .availability { padding: 1.4rem 1.1rem 1.2rem; margin-bottom: 2rem; }
+  .availability-head { align-items: flex-start; gap: 0.9rem; }
+  .availability-title h3 { font-size: 1.3rem; }
+  .cal-legend { gap: 0.9rem; font-size: 0.72rem; }
+  .cal { gap: 0.2rem; }
+  .cal-months { gap: 0; }
+  .cal-nav { width: 34px; height: 34px; font-size: 1.2rem; }
+  .cal-day { font-size: 0.85rem; border-radius: 7px; }
+  .cal-status { margin-top: 1rem; padding-top: 1rem; font-size: 0.82rem; }
+  .cal-hours { font-size: 0.73rem; }
   .form-row { grid-template-columns: 1fr; }
 
   /* ── Banner */

@@ -493,6 +493,53 @@
           </p>
         </div>
 
+        <!-- Availability calendar -->
+        <div class="availability reveal-up" id="availability">
+          <div class="availability-head">
+            <div class="availability-title">
+              <h3>Disponibilità</h3>
+              <p class="availability-sub">
+                Sincronizzata con Airbnb e Booking.com —
+                <span id="cal-updated">caricamento…</span>
+              </p>
+            </div>
+            <ul class="cal-legend">
+              <li><i class="cal-dot cal-dot-free"></i>Libero</li>
+              <li><i class="cal-dot cal-dot-booked"></i>Occupato</li>
+            </ul>
+          </div>
+
+          <div class="cal">
+            <button
+              type="button"
+              class="cal-nav cal-nav-prev"
+              id="cal-prev"
+              aria-label="Mese precedente"
+            >
+              ‹
+            </button>
+            <div class="cal-months" id="cal-months"></div>
+            <button
+              type="button"
+              class="cal-nav cal-nav-next"
+              id="cal-next"
+              aria-label="Mese successivo"
+            >
+              ›
+            </button>
+          </div>
+
+          <p class="cal-status" id="cal-status" role="status" aria-live="polite">
+            Tocca il giorno di arrivo, poi quello di partenza.
+          </p>
+
+          <ul class="cal-hours">
+            <li>Check-in <strong>dalle 15:00</strong></li>
+            <li>Check-out <strong>entro le 11:00</strong></li>
+            <li>Si paga a notte</li>
+          </ul>
+        </div>
+
         <div class="booking-grid">
           <!-- Contact cards -->
           <div class="contact-cards reveal-left">
@@ -523,18 +570,14 @@
               <span class="contact-arrow">→</span>
             </a>
 
-            <!-- Calendly — DISABLED, enable when ready -->
-            <div
-              class="contact-card contact-calendly disabled"
-              title="Disponibile presto"
-            >
+            <a href="#availability" class="contact-card contact-calendar">
               <div class="contact-icon">📅</div>
               <div class="contact-info">
                 <strong>Calendario disponibilità</strong>
-                <span>Integrazione in arrivo — prossimamente</span>
+                <span>Aggiornato da Airbnb e Booking.com ogni 2 ore</span>
               </div>
-              <span class="coming-soon-tag">Presto</span>
-            </div>
+              <span class="contact-arrow">↑</span>
+            </a>
 
             <!-- Payment — DISABLED, enable when ready -->
             <div
@@ -721,5 +764,6 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/calendar.js"></script>
   </body>
 </html>

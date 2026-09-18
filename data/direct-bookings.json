@@ -1,0 +1,10 @@
+{
+  "_comment": "Prenotazioni ricevute direttamente dal sito / WhatsApp / email. Lo script le unisce al calendario pubblico e le esporta in calendar/direct.ics, che Airbnb e Booking.com importano per bloccare le stesse date. Copia la forma di _example dentro bookings. checkout è il giorno di partenza: NON conta come notte occupata, resta libero come arrivo per l'ospite successivo (check-out entro le 11:00, check-in dalle 15:00). Per liberare delle date, cancella la riga.",
+  "_example": {
+    "id": "rossi-2026-07-14",
+    "checkin": "2026-07-14",
+    "checkout": "2026-07-19",
+    "guest": "Mario Rossi"
+  },
+  "bookings": []
+}
