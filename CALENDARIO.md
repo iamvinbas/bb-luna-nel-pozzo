@@ -2,10 +2,10 @@
 
 Il sito mostra la disponibilità reale leggendo il calendario iCal di Airbnb.
 Nessun server, nessun costo, nessun servizio esterno: un'azione GitHub gira ogni
-2 ore, scarica il feed e aggiorna un file nel repo.
+15 minuti, scarica il feed e aggiorna un file nel repo.
 
 ```
-Airbnb ──► GitHub Actions (ogni 2h) ──► data/availability.json ──► calendario sul sito
+Airbnb ──► GitHub Actions (ogni 15 min) ──► data/availability.json ──► calendario sul sito
 ```
 
 **Airbnb è il calendario padrone.** Prenotazioni e blocchi manuali li fai lì —
@@ -22,7 +22,7 @@ codice per gestire le prenotazioni.
 |---|---|
 | Feed Airbnb (`ICAL_AIRBNB`) | ✅ configurato |
 | Calendario sul sito | ✅ online |
-| Sincronizzazione automatica | ✅ ogni 2 ore |
+| Sincronizzazione automatica | ✅ ogni 15 minuti |
 | Feed Booking (`ICAL_BOOKING`) | ⬜ da fare |
 | Export `calendar/direct.ics` | ✅ generato, non ancora importato da nessuno |
 
@@ -38,7 +38,7 @@ data. Il blocco scatta quando decidi tu che la prenotazione è valida.
 
 1. Rispondi su WhatsApp, concorda date e caparra.
 2. **App Airbnb** → Calendario → seleziona le date → **Blocca**.
-3. Fatto. Entro 2 ore il sito mostra quelle notti occupate.
+3. Fatto. Il sito mostra quelle notti occupate entro ~15-20 minuti.
 
 Per liberarle, le sblocchi su Airbnb allo stesso modo.
 
@@ -86,7 +86,7 @@ GitHub → **Actions** → *Sincronizza calendario* → **Run workflow**.
 | Calendario non disponibile | `availability.json` manca | Run workflow a mano |
 | Mesi lontani tutti occupati | Airbnb esporta come "non disponibile" tutto ciò che cade oltre la tua finestra di prenotazione | Airbnb → Calendario → Disponibilità → **Preavviso e finestra di prenotazione** → allarga (es. 12 mesi) |
 | Workflow rosso, "URL iCal non configurato" | Secret mancante o rinominato | [Secrets](https://github.com/iamvinbas/bb-luna-nel-pozzo/settings/secrets/actions) → ricontrolla `ICAL_AIRBNB` |
-| Date vecchie sul sito | Il cron di GitHub può ritardare | Normale fino a ~2h; per forzare, Run workflow |
+| Date vecchie sul sito | Il cron di GitHub può ritardare sotto carico | Normale fino a ~20 min; per forzare, Run workflow |
 
 ### Impostazioni
 
@@ -103,7 +103,9 @@ Gli orari stanno solo qui: finiscono in `availability.json` e il calendario li
 legge da lì. Cambiarli in un punto li cambia ovunque.
 
 Frequenza: il `cron` in `.github/workflows/sync-calendar.yml`
-(`'17 */2 * * *'` = ogni 2 ore).
+(`'*/15 * * * *'` = ogni 15 minuti). Il repo è pubblico, quindi i minuti Actions
+sono gratis: il limite non è il costo ma il ritardo di coda di GitHub, che sotto
+le 15' mangia il guadagno.
 
 Prova in locale:
 
@@ -132,7 +134,8 @@ Con due piattaforme nasce il rischio che entrambe vendano le stesse notti. Ci
 sono due strategie e **si escludono a vicenda**:
 
 **Prevenire** — fai importare a Booking il calendario di Airbnb e viceversa.
-Ogni prenotazione blocca l'altra piattaforma entro poche ore. Massima
+Ogni prenotazione blocca l'altra piattaforma entro poche ore: quella cadenza la
+decidono loro, non noi, ed è il tratto più lento dell'intera catena. Massima
 protezione, ma l'allarme sovrapposizioni diventa cieco: non distingue più un
 overbooking reale dall'eco di una prenotazione rimbalzata tra i due feed.
 

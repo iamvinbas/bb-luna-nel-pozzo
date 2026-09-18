@@ -78,7 +78,12 @@
 
   async function load() {
     try {
-      const res = await fetch('data/availability.json', { cache: 'no-cache' });
+      // GitHub Pages serve con Cache-Control: max-age=600, quindi il CDN
+      // terrebbe il file fino a 10 minuti anche dopo un aggiornamento.
+      // `cache: no-cache` convince il browser ma non l'edge: serve un URL
+      // diverso. Granularità al minuto — il file pesa meno di 1 KB.
+      const bust = Math.floor(Date.now() / 60000);
+      const res = await fetch(`data/availability.json?t=${bust}`, { cache: 'no-cache' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
 

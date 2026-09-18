@@ -2,8 +2,12 @@ name: Sincronizza calendario
 
 on:
   schedule:
-    # Ogni 2 ore. GitHub Actions può ritardare l'esecuzione di qualche minuto.
-    - cron: '17 */2 * * *'
+    # Ogni 15 minuti. Il repo è pubblico, quindi i minuti Actions sono gratis, e
+    # il feed Airbnb esce con no-cache: ogni fetch è dato vivo. Le esecuzioni
+    # che non trovano variazioni non committano nulla e costano ~20 secondi.
+    # GitHub può ritardare i job schedulati sotto carico: 15' è il compromesso
+    # onesto, sotto quella soglia il ritardo di coda supera il guadagno.
+    - cron: '*/15 * * * *'
   workflow_dispatch: # esecuzione manuale dalla tab Actions
   push:
     branches: [master]
