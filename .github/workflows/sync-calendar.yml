@@ -45,8 +45,10 @@ jobs:
         run: |
           git config user.name  "calendar-sync[bot]"
           git config user.email "calendar-sync@users.noreply.github.com"
-          # -A e non i due path: se lo script è uscito in errore i file possono
-          # non esistere, e `git add <path inesistente>` fallirebbe il job
+          # Le cartelle possono non esistere: calendar/ nasce col primo run, e
+          # se lo script esce in errore non scrive nulla. Senza mkdir il comando
+          # git add fallirebbe con "pathspec did not match any files".
+          mkdir -p data calendar
           git add -A data calendar
           if git diff --staged --quiet; then
             echo "Nessuna variazione di disponibilità."
