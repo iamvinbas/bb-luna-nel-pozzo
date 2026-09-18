@@ -212,16 +212,62 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
     attributionControl: false,
   });
 
-  // CartoDB Voyager — colorful, clean, Airbnb-like
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    subdomains: 'abcd',
-    maxZoom: 20,
-  }).addTo(map);
+  /* Tile provider.
+     Niente CARTO: da settembre 2026 stampa "API KEY REQUIRED" dentro le tile
+     restituendo comunque HTTP 200, quindi il guasto è invisibile al codice —
+     si vede solo guardando l'immagine. Qui si usano provider senza chiave, con
+     un ricambio automatico se il primo smette di rispondere. */
+  const PROVIDERS = [
+    {
+      url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      maxZoom: 19,
+      attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>',
+    },
+    {
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+      maxZoom: 19,
+      attribution: '© <a href="https://www.esri.com/" target="_blank" rel="noopener">Esri</a>',
+    },
+  ];
 
-  // Minimal attribution bottom-right
-  L.control.attribution({ position: 'bottomright', prefix: false })
-    .addAttribution('© <a href="https://carto.com/" target="_blank">CARTO</a> · © <a href="https://www.openstreetmap.org/copyright" target="_blank">OSM</a>')
+  const attributionCtl = L.control
+    .attribution({ position: 'bottomright', prefix: false })
     .addTo(map);
+
+  let activeLayer = null;
+  let activeIndex = -1;
+
+  function useProvider(i) {
+    const provider = PROVIDERS[i];
+
+    // Finiti i ricambi: sfondo pieno invece di una griglia di tile rotte.
+    // La scheda con indirizzo e link a Google Maps resta comunque leggibile.
+    if (!provider) {
+      mapEl.classList.add('map-tiles-failed');
+      return;
+    }
+
+    if (activeLayer) {
+      map.removeLayer(activeLayer);
+      attributionCtl.removeAttribution(PROVIDERS[activeIndex].attribution);
+    }
+
+    activeIndex = i;
+    let errors = 0;
+
+    activeLayer = L.tileLayer(provider.url, { maxZoom: provider.maxZoom });
+
+    // Qualche tile mancante ai bordi è normale; un provider giù le sbaglia
+    // tutte. La soglia distingue i due casi.
+    activeLayer.on('tileerror', () => {
+      if (++errors === 4 && activeIndex === i) useProvider(i + 1);
+    });
+
+    activeLayer.addTo(map);
+    attributionCtl.addAttribution(provider.attribution);
+  }
+
+  useProvider(0);
 
   // Zoom controls bottom-right (Airbnb style)
   L.control.zoom({ position: 'bottomright' }).addTo(map);

@@ -851,6 +851,20 @@ ul { list-style: none; }
   z-index: 0;
 }
 
+/* Nessun provider di tile raggiungibile: fondo pieno nei colori del sito
+   invece di una griglia grigia rotta. Il pin e la scheda con l'indirizzo
+   restano al loro posto, quindi la sezione continua a comunicare qualcosa. */
+#interactive-map.map-tiles-failed {
+  background:
+    radial-gradient(circle at 50% 45%, rgba(201,168,76,0.18) 0%, transparent 55%),
+    linear-gradient(160deg, var(--cream) 0%, var(--cream-dark) 100%);
+}
+
+#interactive-map.map-tiles-failed .leaflet-tile-pane,
+#interactive-map.map-tiles-failed .leaflet-control-container .leaflet-control-attribution {
+  display: none;
+}
+
 /* Floating card — Airbnb style */
 .map-float-card {
   position: absolute;
