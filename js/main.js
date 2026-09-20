@@ -250,9 +250,14 @@ function setFieldError(id, message) {
 
   let hint = group.querySelector('.field-error');
 
+  // La nota fissa sotto il campo ("Giorno di arrivo — dalle 15:00") è anch'essa
+  // in aria-describedby: va conservata, non sostituita dall'errore.
+  const baseHint = group.querySelector('.field-hint')?.id;
+
   if (!message) {
     el.removeAttribute('aria-invalid');
-    el.removeAttribute('aria-describedby');
+    if (baseHint) el.setAttribute('aria-describedby', baseHint);
+    else el.removeAttribute('aria-describedby');
     group.classList.remove('has-error');
     hint?.remove();
     return;
@@ -266,10 +271,13 @@ function setFieldError(id, message) {
     // a ogni tasto premuto mentre si corregge il campo.
     hint.setAttribute('aria-live', 'polite');
     group.appendChild(hint);
+    // Sotto il campo ma sopra la nota fissa: l'errore è la cosa da leggere prima.
+    const fixed = group.querySelector('.field-hint');
+    if (fixed) group.insertBefore(hint, fixed);
   }
   hint.textContent = message;
   el.setAttribute('aria-invalid', 'true');
-  el.setAttribute('aria-describedby', hint.id);
+  el.setAttribute('aria-describedby', [baseHint, hint.id].filter(Boolean).join(' '));
   group.classList.add('has-error');
 }
 
@@ -314,6 +322,12 @@ FIELDS.forEach((id) => {
     if (e.relatedTarget?.type === 'submit') return;
     if (el.value.trim()) setFieldError(id, validateField(id));
   });
+});
+
+/* Il calendario controlla le date appena vengono digitate e segna di rosso le
+   notti occupate. Qui si chiude il cerchio sul campo, senza aspettare l'invio. */
+window.addEventListener('luna:dates-rejected', (e) => {
+  setFieldError('checkin', e.detail.problem + ' Guarda le celle in rosso sul calendario.');
 });
 
 form.addEventListener('submit', (e) => {
@@ -605,11 +619,12 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
   mqMobile.addEventListener('change', syncMapGestures);
 })();
 
-/* ── SET min date for date inputs to today ──────────── */
+/* ── LIMITE MINIMO DELLE DATE ───────────────────────── */
+/* Solo il pavimento "non nel passato", come rete di sicurezza per il caso in
+   cui il calendario non riesca a caricarsi. I limiti veri (orizzonte
+   pubblicato e soggiorno minimo) li mette calendar.js: il vecchio handler qui
+   riscriveva checkout.min con la data di arrivo, riaprendo la porta a
+   prenotazioni di una notte sola. */
 const today = new Date().toISOString().split('T')[0];
-document.getElementById('checkin').min  = today;
+document.getElementById('checkin').min = today;
 document.getElementById('checkout').min = today;
-
-document.getElementById('checkin').addEventListener('change', function () {
-  document.getElementById('checkout').min = this.value;
-});

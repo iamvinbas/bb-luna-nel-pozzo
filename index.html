@@ -516,7 +516,7 @@
             </div>
             <ul class="cal-legend">
               <li><i class="cal-dot cal-dot-free"></i>Libero</li>
-              <li><i class="cal-dot cal-dot-booked"></i>Occupato</li>
+              <li><i class="cal-dot cal-dot-booked"></i>Non disponibile</li>
             </ul>
           </div>
 
@@ -631,12 +631,30 @@
               </div>
               <div class="form-row">
                 <div class="form-group">
-                  <label for="checkin">Arrivo</label>
-                  <input type="date" id="checkin" name="checkin" required />
+                  <label for="checkin">Check-in</label>
+                  <input
+                    type="date"
+                    id="checkin"
+                    name="checkin"
+                    aria-describedby="checkin-hint"
+                    required
+                  />
+                  <p class="field-hint" id="checkin-hint">
+                    Giorno di arrivo — dalle 15:00
+                  </p>
                 </div>
                 <div class="form-group">
-                  <label for="checkout">Partenza</label>
-                  <input type="date" id="checkout" name="checkout" required />
+                  <label for="checkout">Check-out</label>
+                  <input
+                    type="date"
+                    id="checkout"
+                    name="checkout"
+                    aria-describedby="checkout-hint"
+                    required
+                  />
+                  <p class="field-hint" id="checkout-hint">
+                    Giorno di partenza — entro le 11:00
+                  </p>
                 </div>
               </div>
               <div class="form-group">

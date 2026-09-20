@@ -43,8 +43,15 @@
 
 /* ── TABLET E SOTTO (≤ 1024px) ──────────────────────── */
 @media (max-width: 1024px) {
-  /* Il parallasse delle foto città viene spento da main.js sotto i 768px:
-     qui tolgo lo zoom residuo così l'immagine non resta tagliata. */
+  /* Le spaziature non sono legate fra loro da un breakpoint all'altro: ogni
+     fascia ridefinisce i tre token e ottiene il ritmo che le serve. Il resto
+     del foglio non tocca più i padding di sezione. */
+  :root {
+    --gutter: 2.25rem;
+    --section-y: 5.5rem;
+    --card-pad: 1.85rem;
+  }
+
   .about-grid { gap: 3rem; }
   .features-grid { grid-template-columns: repeat(2, 1fr); }
 }
@@ -52,9 +59,12 @@
 /* ── TABLET (≤ 768px) ───────────────────────────────── */
 @media (max-width: 768px) {
 
-  /* Sezioni — padding ridotto */
-  .about, .features, .virtual-tour, .booking { padding: 4rem 0; }
-  .gallery, .city, .location { padding-top: 4rem; }
+  :root {
+    --gutter: 1.5rem;
+    --section-y: 4rem;
+    --card-pad: 1.5rem;
+  }
+
   .section-header { margin-bottom: 2rem; }
 
   /* ── Reveal: niente movimento orizzontale.
@@ -151,8 +161,56 @@
   }
   .about-stats { grid-template-columns: repeat(2, 1fr); }
 
-  /* ── Features */
-  .features-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  /* ── Comfort: da riquadri alti a righe.
+     Otto riquadri impilati occupavano quasi due schermate di scorrimento per
+     otto righe di testo. In riga l'icona sta a sinistra e la descrizione le
+     scorre accanto: stessa informazione, circa un terzo dell'altezza. */
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .feature-card {
+    display: grid;
+    grid-template-columns: 42px 1fr;
+    align-items: center;
+    column-gap: 0.9rem;
+    row-gap: 0.15rem;
+    background: none;
+    border: 0;
+    /* Una riga sola fra un comfort e l'altro, mai sotto l'ultimo */
+    border-top: 1px solid rgba(255,255,255,0.07);
+    border-radius: 0;
+    padding: 0.95rem 1.1rem;
+  }
+
+  .feature-card:first-child { border-top: 0; }
+
+  .feature-icon {
+    grid-row: span 2;
+    width: 42px;
+    height: 42px;
+    font-size: 1.2rem;
+    border-radius: 12px;
+    margin-bottom: 0;
+  }
+
+  .feature-card h3 {
+    margin-bottom: 0;
+    align-self: end;
+    font-size: 0.95rem;
+  }
+
+  .feature-card p {
+    align-self: start;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: rgba(255,255,255,0.5);
+  }
 
   /* ── Gallery:
        grid-template-rows espliciti → le img position:absolute trovano il contenitore */
@@ -210,7 +268,7 @@
 
   /* ── Booking */
   .booking-grid { grid-template-columns: 1fr; gap: 2rem; }
-  .booking-form { padding: 1.5rem 1.25rem; }
+  .booking-form { padding: var(--card-pad) calc(var(--card-pad) - 0.25rem); }
 
   /* Sotto i 16px iOS ingrandisce la pagina appena si tocca il campo, e al
      ritorno resta storta di lato. 16px esatti = nessuno zoom. */
@@ -222,7 +280,9 @@
   }
   .form-row { grid-template-columns: 1fr; gap: 0; }
 
-  /* ── Calendario disponibilità: un mese, celle più toccabili */
+  /* ── Calendario disponibilità: un mese, celle più toccabili.
+     È l'unico riquadro che si scosta da --card-pad: ogni millimetro tolto ai
+     lati va alle sette colonne dei giorni, che devono restare toccabili. */
   .availability { padding: 1.4rem 1.1rem 1.2rem; margin-bottom: 2rem; }
   .availability-head { align-items: flex-start; gap: 0.9rem; }
   .availability-title h3 { font-size: 1.3rem; }
@@ -283,13 +343,14 @@
 /* ── SMARTPHONE (≤ 480px) ───────────────────────────── */
 @media (max-width: 480px) {
 
-  /* Margine laterale unico e un po' più stretto: sotto questa soglia
-     5vw lascerebbe meno di 24px di testo utile per riga. */
-  :root { --gutter: 1.15rem; }
+  /* Telefono: margini stretti, sezioni ravvicinate. Sotto questa soglia un
+     gutter più largo toglierebbe righe di testo utile senza dare respiro. */
+  :root {
+    --gutter: 1.15rem;
+    --section-y: 3rem;
+    --card-pad: 1.2rem;
+  }
 
-  /* Sezioni — padding ancora ridotto */
-  .about, .features, .virtual-tour, .booking { padding: 3rem 0; }
-  .gallery, .city, .location { padding-top: 3rem; }
   .section-header { margin-bottom: 1.5rem; }
   .section-desc { font-size: 1rem; }
 
@@ -309,9 +370,8 @@
   .stat-num { font-size: 1.5rem; }
   .stat-label { font-size: 0.62rem; letter-spacing: 0.04em; }
 
-  /* ── Features: una colonna */
-  .features-grid { grid-template-columns: 1fr; }
-  .feature-card { padding: 1.4rem 1rem; }
+  /* ── Comfort: righe ancora più compatte */
+  .feature-card { padding: 0.85rem 0.95rem; column-gap: 0.8rem; }
 
   /* ── Gallery: una colonna, celle più alte */
   .gallery-grid {
@@ -389,7 +449,11 @@
 /* iPhone SE, Galaxy A d'ingresso e simili: qui i titoli grandi sono la
    prima cosa che sfonda il bordo. */
 @media (max-width: 380px) {
-  :root { --gutter: 1rem; }
+  :root {
+    --gutter: 1rem;
+    --section-y: 2.5rem;
+    --card-pad: 1rem;
+  }
 
   .hero-title { font-size: 2.6rem; }
   .section-title { font-size: 1.75rem; }

@@ -54,6 +54,9 @@
     checkin: null,
     checkout: null,
     hover: null,
+    // Notti digitate a mano che risultano non disponibili: si colorano di
+    // rosso sul calendario, così la data scartata si vede dov'è.
+    rejected: new Set(),
     monthsShown: window.matchMedia('(max-width: 768px)').matches ? 1 : 2,
   };
 
@@ -114,8 +117,8 @@
       root.classList.remove('cal-unavailable');
       root.classList.remove('cal-loading');
 
-      renderSourceLabel();
       paintUpdated();
+      applyInputBounds();
 
       // Se le date già scelte sono appena state prese da qualcun altro,
       // dirlo subito vale più di lasciare una selezione ormai falsa.
@@ -175,27 +178,7 @@
     elUpdated.classList.add('just-updated');
   }
 
-  /* Nome delle sorgenti davvero attive. Il sito dichiarava sempre
-     "Sincronizzata con Airbnb e Booking.com" anche quando una delle due non
-     rispondeva: una promessa che il dato non manteneva. */
-  function renderSourceLabel() {
-    const el = document.getElementById('cal-sources');
-    if (!el || !state.sources) return;
-
-    const live = Object.values(state.sources).filter((s) => s.ok).map((s) => s.label);
-    const down = Object.values(state.sources).filter((s) => !s.ok).map((s) => s.label);
-
-    if (!down.length) {
-      el.textContent = `Sincronizzata con ${live.join(' e ')}`;
-      el.classList.remove('is-warn');
-      return;
-    }
-    el.textContent = live.length
-      ? `Sincronizzata con ${live.join(' e ')} — ${down.join(' e ')} non risponde`
-      : 'Sincronizzazione non disponibile';
-    el.classList.add('is-warn');
-  }
-
+  /** "ora" / "12 minuti fa" / "3 ore fa" / "il 18 set" */
   function relTime(d) {
     const mins = Math.round((Date.now() - d.getTime()) / 60000);
     if (mins < 2) return 'ora';
@@ -204,6 +187,12 @@
     if (hrs < 24) return `${hrs} ${hrs === 1 ? 'ora' : 'ore'} fa`;
     return `il ${d.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' })}`;
   }
+
+  /* La riga sulle sorgenti resta quella scritta nell'HTML, sempre uguale.
+     Una piattaforma che non risponde è un problema di gestione, non una cosa
+     che riguardi l'ospite: il proprietario blocca comunque quelle date da
+     Airbnb, che il sito legge. La diagnostica vera sta in availability.json
+     e nell'annotazione del run di GitHub Actions, dove la legge chi gestisce. */
 
   /* ── rendering ─────────────────────────────────────── */
 
@@ -273,6 +262,8 @@
       label += ' — libero';
     }
 
+    if (state.rejected.has(toISO(ms))) btn.classList.add('is-rejected');
+
     // Selezione in corso
     if (state.checkin !== null && ms === state.checkin) btn.classList.add('is-start');
     if (state.checkout !== null && ms === state.checkout) btn.classList.add('is-end');
@@ -321,7 +312,9 @@
       state.checkin = ms;
       state.checkout = null;
     }
+    state.rejected.clear();
     syncForm();
+    applyInputBounds();
     render();
   }
 
@@ -442,11 +435,80 @@
     },
   };
 
+  /* ── date digitate a mano ──────────────────────────── */
+
+  /* min/max sui campi: il selettore nativo del telefono non mostra nemmeno i
+     giorni fuori dall'orizzonte pubblicato. Non basta da solo — la data si
+     può sempre scrivere a mano — ma toglie di mezzo il caso più comune. */
+  function applyInputBounds() {
+    if (!inCheckin || !inCheckout) return;
+    const min = toISO(TODAY);
+    const max = toISO(state.horizonEnd - DAY);
+    inCheckin.min = min;
+    inCheckin.max = max;
+    inCheckout.min = state.checkin !== null
+      ? toISO(state.checkin + state.minNights * DAY)
+      : toISO(TODAY + state.minNights * DAY);
+    inCheckout.max = toISO(state.horizonEnd);
+  }
+
+  /**
+   * Controlla ciò che è stato digitato e segna di rosso, sul calendario, le
+   * notti non disponibili. Prima una data occupata scritta a mano restava lì
+   * senza un segnale: l'errore arrivava solo al momento dell'invio.
+   */
+  function reviewTypedDates() {
+    state.rejected.clear();
+    if (!state.loaded) return null;
+
+    const a = inCheckin?.value ? fromISO(inCheckin.value) : null;
+    const b = inCheckout?.value ? fromISO(inCheckout.value) : null;
+
+    if (a === null) return null;
+
+    if (isBooked(a)) state.rejected.add(toISO(a));
+
+    // Con entrambe le date si controlla tutto l'intervallo: il problema può
+    // stare nel mezzo, non per forza sul giorno di arrivo.
+    if (b !== null && b > a) {
+      for (let t = a; t < b; t += DAY) if (isBooked(t)) state.rejected.add(toISO(t));
+    }
+
+    if (!state.rejected.size) return null;
+
+    const first = [...state.rejected].sort()[0];
+    return state.rejected.size === 1
+      ? `Il ${fmtLong(fromISO(first))} non è disponibile.`
+      : `${state.rejected.size} notti del periodo scelto non sono disponibili, ` +
+        `a partire dal ${fmtLong(fromISO(first))}.`;
+  }
+
+  /** Porta il calendario sul mese di una data e la mostra. */
+  function focusMonthOf(ms) {
+    const d = new Date(ms);
+    state.cursor = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1);
+  }
+
   /* Date digitate a mano nel form → riflesse sul calendario */
   for (const input of [inCheckin, inCheckout]) {
     input?.addEventListener('change', () => {
-      if (inCheckin.value) state.checkin = fromISO(inCheckin.value);
+      state.checkin = inCheckin.value ? fromISO(inCheckin.value) : null;
       state.checkout = inCheckout.value ? fromISO(inCheckout.value) : null;
+      state.hover = null;
+
+      const problem = reviewTypedDates();
+      applyInputBounds();
+
+      if (problem) {
+        // Il calendario si sposta sul mese della data scartata: dire "non
+        // disponibile" mentre a schermo c'è un altro mese non aiuta nessuno.
+        focusMonthOf(fromISO([...state.rejected].sort()[0]));
+        render();
+        elStatus.innerHTML = `${problem} Le notti in rosso sono già prenotate — scegline altre.`;
+        elStatus.classList.add('is-warn');
+        window.dispatchEvent(new CustomEvent('luna:dates-rejected', { detail: { problem } }));
+        return;
+      }
       render();
     });
   }

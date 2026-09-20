@@ -21,10 +21,14 @@
   --shadow-lg:    0 20px 60px rgba(13,33,55,0.18);
   --radius:       12px;
   --radius-lg:    20px;
-  /* Margine laterale unico per tutta la pagina. Ogni sezione lo eredita dal
-     .container: così i bordi restano allineati a qualsiasi larghezza invece di
-     spostarsi di qualche pixel da una sezione all'altra. */
-  --gutter:       clamp(1.15rem, 5vw, 3rem);
+  /* ── SPAZIATURE ──
+     Tre valori, ridefiniti per fascia di dispositivo in mobile.css. Il resto
+     del foglio non scrive mai un padding di sezione a mano: cambiando questi
+     cambia tutto il ritmo della pagina, e telefono, tablet e desktop possono
+     avere respiro diverso senza toccarsi a vicenda. */
+  --gutter:       3rem;   /* margine laterale del contenuto */
+  --section-y:    7rem;   /* aria sopra e sotto ogni sezione */
+  --card-pad:     2rem;   /* imbottitura interna dei riquadri */
   --transition:   0.4s cubic-bezier(0.4, 0, 0.2, 1);
   --font-serif:   'Playfair Display', Georgia, serif;
   --font-sans:    'Inter', system-ui, sans-serif;
@@ -516,7 +520,7 @@ ul { list-style: none; }
 
 /* ── ABOUT ──────────────────────────────────────────── */
 .about {
-  padding: 7rem 0;
+  padding: var(--section-y) 0;
   background: var(--cream);
 }
 
@@ -586,7 +590,7 @@ ul { list-style: none; }
 
 /* ── FEATURES ───────────────────────────────────────── */
 .features {
-  padding: 7rem 0;
+  padding: var(--section-y) 0;
   background: var(--navy);
 }
 
@@ -600,12 +604,16 @@ ul { list-style: none; }
   gap: 1.5rem;
 }
 
+/* Riquadro comfort: icona in un tondo, titolo, riga di descrizione.
+   L'icona in un cerchio dorato dà alla griglia un ritmo visivo regolare —
+   otto emoji nude a dimensioni diverse facevano sembrare le celle storte. */
 .feature-card {
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: var(--radius-lg);
-  padding: 2rem 1.5rem;
-  transition: all var(--transition);
+  padding: 1.75rem 1.4rem;
+  transition: background var(--transition), border-color var(--transition),
+              transform var(--transition), box-shadow var(--transition);
 }
 
 .feature-card:hover {
@@ -615,24 +623,38 @@ ul { list-style: none; }
   box-shadow: 0 12px 30px rgba(0,0,0,0.3);
 }
 
-.feature-icon { font-size: 2rem; margin-bottom: 1rem; }
+.feature-icon {
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1.35rem;
+  line-height: 1;
+  border-radius: 14px;
+  background: rgba(201,168,76,0.14);
+  border: 1px solid rgba(201,168,76,0.22);
+  margin-bottom: 1rem;
+}
 
 .feature-card h3 {
   color: var(--white);
-  font-size: 1rem;
+  font-size: 0.98rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.35rem;
+  letter-spacing: 0.01em;
 }
 
 .feature-card p {
   color: rgba(255,255,255,0.55);
-  font-size: 0.88rem;
-  line-height: 1.6;
+  font-size: 0.86rem;
+  line-height: 1.55;
 }
 
 /* ── GALLERY ────────────────────────────────────────── */
 .gallery {
-  padding: 7rem 0 0;
+  padding: var(--section-y) 0 0;
   background: var(--cream);
 }
 
@@ -682,7 +704,7 @@ ul { list-style: none; }
 
 /* ── CITY — MOLFETTA ────────────────────────────────── */
 .city {
-  padding: 7rem 0 0;
+  padding: var(--section-y) 0 0;
   background: var(--cream);
   overflow: hidden;
 }
@@ -800,7 +822,7 @@ ul { list-style: none; }
 
 /* ── VIRTUAL TOUR ───────────────────────────────────── */
 .virtual-tour {
-  padding: 7rem 0;
+  padding: var(--section-y) 0;
   background: var(--cream-dark);
   text-align: center;
 }
@@ -846,7 +868,7 @@ ul { list-style: none; }
 
 /* ── LOCATION ───────────────────────────────────────── */
 .location {
-  padding: 7rem 0 0;
+  padding: var(--section-y) 0 0;
   background: var(--cream);
 }
 
@@ -1001,7 +1023,7 @@ ul { list-style: none; }
 
 /* ── BOOKING ────────────────────────────────────────── */
 .booking {
-  padding: 7rem 0;
+  padding: var(--section-y) 0;
   background: var(--navy);
 }
 
@@ -1095,7 +1117,7 @@ ul { list-style: none; }
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: var(--radius-lg);
-  padding: 2rem 2.2rem 1.6rem;
+  padding: var(--card-pad) calc(var(--card-pad) + 0.2rem) calc(var(--card-pad) - 0.4rem);
   margin-bottom: 3rem;
 }
 
@@ -1249,6 +1271,23 @@ ul { list-style: none; }
   text-decoration: none;
 }
 
+/* Notte non disponibile finita in un intervallo digitato a mano.
+   Diversa dal grigio "non disponibile": quella è informazione di sfondo,
+   questa è la risposta a una cosa che l'ospite ha appena scritto. */
+.cal-day.is-rejected {
+  background: rgba(255,107,107,0.28);
+  color: #ffd9d9;
+  text-decoration: line-through;
+  box-shadow: inset 0 0 0 1px rgba(255,107,107,0.75);
+  animation: cal-reject 0.5s ease-out;
+}
+
+@keyframes cal-reject {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
 .cal-day:focus-visible {
   outline: 2px solid var(--gold-light);
   outline-offset: 2px;
@@ -1304,7 +1343,7 @@ ul { list-style: none; }
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: var(--radius-lg);
-  padding: 2.5rem;
+  padding: calc(var(--card-pad) + 0.5rem);
 }
 
 .booking-form h3 {
@@ -1586,6 +1625,15 @@ ul { list-style: none; }
 
 .form-error a { color: var(--gold); text-decoration: underline; }
 
+/* Nota fissa sotto un campo: spiega cosa significa, non segnala un errore.
+   Sta sempre lì, quindi l'errore che compare dopo non sposta il layout. */
+.field-hint {
+  color: rgba(255,255,255,0.4);
+  font-size: 0.76rem;
+  line-height: 1.4;
+  margin-top: 0.1rem;
+}
+
 .field-error {
   color: #ff9d9d;
   font-size: 0.78rem;
@@ -1606,8 +1654,6 @@ ul { list-style: none; }
 .form-group.has-error label { color: #ff9d9d; }
 
 /* ── FRESCHEZZA DEL CALENDARIO ──────────────────────── */
-#cal-sources.is-warn { color: var(--gold-light); }
-
 #cal-updated.is-stale {
   color: var(--gold-light);
 }
