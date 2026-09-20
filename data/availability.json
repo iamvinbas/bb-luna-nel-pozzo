@@ -1,17 +1,17 @@
 {
-  "updated": "2026-09-19T22:58:24.806Z",
+  "updated": "2026-09-20T00:38:39.336Z",
   "timezone": "Europe/Rome",
   "minNights": 2,
   "checkinFrom": "15:00",
   "checkoutBy": "11:00",
   "horizon": {
-    "from": "2026-09-19",
-    "to": "2027-09-19"
+    "from": "2026-09-20",
+    "to": "2027-09-20"
   },
   "ranges": [
     {
       "from": "2027-01-01",
-      "to": "2027-09-19"
+      "to": "2027-09-20"
     }
   ],
   "sources": {
