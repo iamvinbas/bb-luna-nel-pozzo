@@ -1212,6 +1212,23 @@ ul { list-style: none; }
   gap: 2.5rem;
   flex: 1;
   min-width: 0;
+  /* Il dito scorre la pagina in verticale; l'orizzontale resta al calendario,
+     che lo usa per cambiare mese. Senza questo il browser prende il gesto. */
+  touch-action: pan-y;
+}
+
+/* Il mese entra dal lato verso cui si è navigato */
+.cal-months.slide-next { animation: cal-slide-next 0.28s cubic-bezier(0.22, 0.8, 0.3, 1); }
+.cal-months.slide-prev { animation: cal-slide-prev 0.28s cubic-bezier(0.22, 0.8, 0.3, 1); }
+
+@keyframes cal-slide-next {
+  from { opacity: 0; transform: translateX(18px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes cal-slide-prev {
+  from { opacity: 0; transform: translateX(-18px); }
+  to   { opacity: 1; transform: none; }
 }
 
 .cal-month { flex: 1; min-width: 0; }
@@ -1274,10 +1291,20 @@ ul { list-style: none; }
   font-size: 0.82rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.18s, color 0.18s;
+  transition: background 0.18s, color 0.18s, transform 0.12s;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .cal-day:hover:not(:disabled) { background: rgba(201,168,76,0.5); }
+
+/* Conferma immediata sotto il dito: l'animazione di selezione arriva dopo il
+   rilascio, e nel frattempo il tocco sembrava non essere stato registrato. */
+.cal-day:active:not(:disabled) {
+  transform: scale(0.9);
+  background: rgba(201,168,76,0.6);
+}
+
+.cal-nav:active:not(:disabled) { transform: scale(0.92); }
 
 .cal-day.is-past {
   background: transparent;
@@ -1575,19 +1602,54 @@ ul { list-style: none; }
   pointer-events: all;
 }
 
-.lightbox-content {
-  max-width: 90vw;
-  max-height: 80vh;
-  border-radius: var(--radius);
-  overflow: hidden;
+/* Nastro orizzontale: una diapositiva per foto, scorrimento nativo con
+   punti di scatto. Occupa tutto il riquadro, così il dito può partire da
+   qualsiasi punto dello schermo. */
+.lightbox-track {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 }
 
-.lightbox-content img {
-  max-height: 80vh;
-  width: auto;
-  max-width: 90vw;
-  object-fit: contain;
+.lightbox-track::-webkit-scrollbar { display: none; }
+
+.lightbox-slide {
+  flex: 0 0 100%;
+  height: 100%;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 1.5rem 6rem;
 }
+
+.lightbox-slide img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: var(--radius);
+  /* Il trascinamento nativo dell'immagine ruberebbe il gesto allo scorrimento */
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.lightbox-missing {
+  color: #aaa;
+  font-size: 1rem;
+  text-align: center;
+  line-height: 1.8;
+}
+
+.lightbox-missing small { opacity: 0.5; }
 
 .lightbox-close,
 .lightbox-prev,
@@ -1617,9 +1679,24 @@ ul { list-style: none; }
   bottom: 2rem;
   left: 50%;
   transform: translateX(-50%);
-  color: rgba(255,255,255,0.7);
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  color: rgba(255,255,255,0.75);
   font-size: 0.9rem;
   letter-spacing: 0.05em;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.lightbox-caption-count {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--navy);
+  background: var(--gold);
+  border-radius: 50px;
+  padding: 0.15rem 0.6rem;
+  letter-spacing: 0.04em;
 }
 
 /* ── SCROLL REVEAL ANIMATIONS ───────────────────────── */

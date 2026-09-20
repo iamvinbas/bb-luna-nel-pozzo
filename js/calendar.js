@@ -196,12 +196,22 @@
 
   /* ── rendering ─────────────────────────────────────── */
 
-  function render() {
-    elMonths.innerHTML = '';
-    for (let i = 0; i < state.monthsShown; i++) {
-      const d = new Date(state.cursor);
-      elMonths.appendChild(renderMonth(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + i, 1)));
+  /* Due passaggi separati, ed è il punto su cui si gioca la reattività.
+     Prima ogni tocco svuotava il contenitore e ricostruiva trenta bottoni con
+     i rispettivi ascoltatori; col passaggio del mouse succedeva a ogni cella
+     attraversata. Ora la struttura si costruisce solo quando cambia il mese e
+     ogni interazione riscrive soltanto le classi delle celle già a schermo. */
+
+  let builtKey = '';           // mesi attualmente costruiti
+  let dayCells = [];           // { ms, btn } delle celle a schermo
+
+  function render({ rebuild = false } = {}) {
+    const key = `${state.cursor}|${state.monthsShown}|${nights.size}`;
+    if (rebuild || key !== builtKey) {
+      buildMonths();
+      builtKey = key;
     }
+    paintDays();
 
     const minMonth = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1);
     elPrev.disabled = state.cursor <= minMonth;
@@ -210,7 +220,18 @@
     renderStatus();
   }
 
-  function renderMonth(firstMs) {
+  function buildMonths() {
+    const frag = document.createDocumentFragment();
+    dayCells = [];
+
+    for (let i = 0; i < state.monthsShown; i++) {
+      const d = new Date(state.cursor);
+      frag.appendChild(buildMonth(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + i, 1)));
+    }
+    elMonths.replaceChildren(frag);
+  }
+
+  function buildMonth(firstMs) {
     const first = new Date(firstMs);
     const year = first.getUTCFullYear();
     const month = first.getUTCMonth();
@@ -230,71 +251,108 @@
 
     const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
     for (let d = 1; d <= daysInMonth; d++) {
-      grid.appendChild(renderDay(Date.UTC(year, month, d)));
+      const ms = Date.UTC(year, month, d);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'cal-day';
+      btn.textContent = d;
+      btn.dataset.date = toISO(ms);
+      grid.appendChild(btn);
+      dayCells.push({ ms, btn });
     }
 
     wrap.appendChild(grid);
     return wrap;
   }
 
-  function renderDay(ms) {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'cal-day';
-    btn.textContent = new Date(ms).getUTCDate();
-    btn.dataset.date = toISO(ms);
-
-    const booked = isBooked(ms);
-    const past = ms < TODAY || ms >= state.horizonEnd;
-
-    let label = fmtLong(ms);
-    if (past) {
-      btn.classList.add('is-past');
-      btn.disabled = true;
-    } else if (booked) {
-      btn.classList.add('is-booked');
-      // La notte è di un altro ospite, ma la mattina è ancora libera: la data
-      // resta valida come NOSTRA partenza (si vende la notte, non la giornata).
-      label += isBooked(ms - DAY)
-        ? ' — occupato'
-        : ` — occupato dalle ${state.checkinFrom}, puoi solo partire entro le ${state.checkoutBy}`;
-    } else {
-      label += ' — libero';
-    }
-
-    if (state.rejected.has(toISO(ms))) btn.classList.add('is-rejected');
-
-    // Selezione in corso
-    if (state.checkin !== null && ms === state.checkin) btn.classList.add('is-start');
-    if (state.checkout !== null && ms === state.checkout) btn.classList.add('is-end');
-
+  /** Riscrive solo lo stato delle celle già costruite. Niente DOM nuovo. */
+  function paintDays() {
     const end = state.checkout ?? (state.checkin !== null ? state.hover : null);
-    if (state.checkin !== null && end !== null && ms > state.checkin && ms < end) {
-      btn.classList.add('is-in-range');
+
+    for (const { ms, btn } of dayCells) {
+      const booked = isBooked(ms);
+      const past = ms < TODAY || ms >= state.horizonEnd;
+
+      const selectable = past
+        ? false
+        : state.checkin === null || state.checkout !== null
+          ? canBeCheckin(ms)
+          : canBeCheckout(ms) || canBeCheckin(ms);
+
+      btn.classList.toggle('is-past', past);
+      btn.classList.toggle('is-booked', !past && booked);
+      btn.classList.toggle('is-rejected', state.rejected.has(btn.dataset.date));
+      btn.classList.toggle('is-start', state.checkin !== null && ms === state.checkin);
+      btn.classList.toggle('is-end', state.checkout !== null && ms === state.checkout);
+      btn.classList.toggle(
+        'is-in-range',
+        state.checkin !== null && end !== null && ms > state.checkin && ms < end,
+      );
+      btn.disabled = past || !selectable;
+
+      let label = fmtLong(ms);
+      if (past) label += ' — non prenotabile';
+      else if (booked) {
+        // La notte è di un altro ospite, ma la mattina è ancora libera: la data
+        // resta valida come NOSTRA partenza (si vende la notte, non la giornata).
+        label += isBooked(ms - DAY)
+          ? ' — occupato'
+          : ` — occupato dalle ${state.checkinFrom}, puoi solo partire entro le ${state.checkoutBy}`;
+      } else label += ' — libero';
+
+      btn.setAttribute('aria-label', label);
+      btn.title = label;
     }
-
-    // Selezionabilità
-    const selectable = state.checkin === null || state.checkout !== null
-      ? canBeCheckin(ms)
-      : canBeCheckout(ms) || canBeCheckin(ms);
-
-    if (!past && !selectable) btn.disabled = true;
-    btn.setAttribute('aria-label', label);
-    btn.title = label;
-
-    if (!btn.disabled) {
-      btn.addEventListener('click', () => pick(ms));
-      btn.addEventListener('mouseenter', () => {
-        // Il guard è necessario: render() ricostruisce le celle, quindi senza
-        // confronto il nuovo bottone sotto al cursore rilancerebbe l'evento.
-        if (state.checkin !== null && state.checkout === null && state.hover !== ms) {
-          state.hover = ms;
-          render();
-        }
-      });
-    }
-    return btn;
   }
+
+  /* ── interazione: un solo ascoltatore per tutto il calendario ───── */
+
+  const cellDate = (e) => {
+    const btn = e.target.closest('.cal-day');
+    if (!btn || btn.disabled || !elMonths.contains(btn)) return null;
+    return fromISO(btn.dataset.date);
+  };
+
+  elMonths.addEventListener('click', (e) => {
+    const ms = cellDate(e);
+    if (ms !== null) pick(ms);
+  });
+
+  /* Anteprima dell'intervallo al passaggio del mouse. Delegata: prima ogni
+     cella aveva il proprio ascoltatore e ricostruiva l'intero calendario. */
+  elMonths.addEventListener('mouseover', (e) => {
+    if (state.checkin === null || state.checkout !== null) return;
+    const ms = cellDate(e);
+    if (ms === null || state.hover === ms) return;
+    state.hover = ms;
+    paintDays();
+  });
+
+  /* ── scorrimento fra i mesi col dito ───────────────── */
+
+  /* Da telefono si vede un mese per volta e le frecce sono due bersagli
+     piccoli in alto: trascinare di lato è il gesto che ci si aspetta. */
+  let swipeX = 0;
+  let swipeY = 0;
+  let swiping = false;
+
+  elMonths.addEventListener('touchstart', (e) => {
+    if (e.touches.length !== 1) return;
+    swipeX = e.touches[0].clientX;
+    swipeY = e.touches[0].clientY;
+    swiping = true;
+  }, { passive: true });
+
+  elMonths.addEventListener('touchend', (e) => {
+    if (!swiping) return;
+    swiping = false;
+    const dx = e.changedTouches[0].clientX - swipeX;
+    const dy = e.changedTouches[0].clientY - swipeY;
+    // Soglia generosa e confronto con il movimento verticale: scorrere la
+    // pagina sopra al calendario non deve cambiare mese per sbaglio.
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    shiftMonth(dx < 0 ? 1 : -1);
+  }, { passive: true });
 
   /* ── selezione ─────────────────────────────────────── */
 
@@ -382,8 +440,22 @@
 
   const shiftMonth = (delta) => {
     const d = new Date(state.cursor);
-    state.cursor = Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + delta, 1);
+    const next = Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + delta, 1);
+
+    // Limiti: non prima del mese corrente, non oltre l'orizzonte pubblicato.
+    const minMonth = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1);
+    if (next < minMonth || next >= state.horizonEnd) return;
+    if (next === state.cursor) return;
+
+    state.cursor = next;
+    state.hover = null;
     render();
+
+    // Il mese entra dal lato da cui è arrivato: senza, il cambio è uno
+    // scatto secco e non si capisce se si è andati avanti o indietro.
+    elMonths.classList.remove('slide-next', 'slide-prev');
+    void elMonths.offsetWidth; // forza il riavvio dell'animazione
+    elMonths.classList.add(delta > 0 ? 'slide-next' : 'slide-prev');
   };
 
   elPrev.addEventListener('click', () => shiftMonth(-1));
@@ -398,12 +470,12 @@
   });
 
   elMonths.addEventListener('mouseleave', () => {
-    if (state.hover !== null) { state.hover = null; render(); }
+    if (state.hover !== null) { state.hover = null; paintDays(); }
   });
 
   window.matchMedia('(max-width: 768px)').addEventListener('change', (e) => {
     state.monthsShown = e.matches ? 1 : 2;
-    render();
+    render({ rebuild: true });
   });
 
   /* ── API per il form ───────────────────────────────── */

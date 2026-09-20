@@ -86,6 +86,11 @@ document.querySelectorAll('.reveal-up, .reveal-left, .reveal-right')
   .forEach(el => revealObserver.observe(el));
 
 /* ── GALLERY LIGHTBOX ───────────────────────────────── */
+/* Le foto stanno tutte dentro un nastro che scorre di lato, con i punti di
+   scatto del browser. Prima ogni cambio riscriveva il contenuto: l'immagine
+   spariva e ricompariva di colpo, senza inerzia né trascinamento. Così invece
+   il dito porta la foto con sé, il rilascio ha lo slancio del sistema, e i
+   tasti muovono lo stesso nastro con uno scorrimento morbido. */
 const galleryItems = document.querySelectorAll('.gallery-item');
 const lightbox     = document.getElementById('lightbox');
 const lightboxContent = document.getElementById('lightbox-content');
@@ -96,16 +101,57 @@ const nextLB       = document.getElementById('lightbox-next');
 
 let currentIndex = 0;
 
-const galleryData = Array.from(galleryItems).map(item => ({
+const galleryData = Array.from(galleryItems).map((item) => ({
   src: item.querySelector('img')?.src || null,
+  alt: item.querySelector('img')?.alt || '',
   caption: item.querySelector('.gallery-overlay span')?.textContent || '',
 }));
 
+/* Le diapositive si costruiscono una volta sola, alla prima apertura: farlo
+   al caricamento della pagina scaricherebbe sei foto a piena risoluzione che
+   forse nessuno guarderà. */
+let slidesBuilt = false;
+
+function buildSlides() {
+  if (slidesBuilt) return;
+  slidesBuilt = true;
+  lightboxContent.classList.add('lightbox-track');
+  lightboxContent.innerHTML = galleryData
+    .map(({ src, alt, caption }) =>
+      `<div class="lightbox-slide">` +
+      (src
+        ? `<img src="${src}" alt="${alt}" draggable="false" />`
+        : `<div class="lightbox-missing">📸<br/>${caption}<br/>` +
+          `<small>Foto disponibile presto</small></div>`) +
+      `</div>`)
+    .join('');
+}
+
+/** Larghezza di una diapositiva = larghezza del nastro. */
+const slideStep = () => lightboxContent.clientWidth || 1;
+
+function goTo(index, behavior = 'smooth') {
+  const i = (index + galleryData.length) % galleryData.length;
+  lightboxContent.scrollTo({ left: i * slideStep(), behavior });
+  setCaption(i);
+}
+
+function setCaption(i) {
+  if (i === currentIndex && lightboxCaption.dataset.filled) return;
+  currentIndex = i;
+  lightboxCaption.dataset.filled = '1';
+  lightboxCaption.innerHTML =
+    `<span class="lightbox-caption-text">${galleryData[i].caption}</span>` +
+    `<span class="lightbox-caption-count">${i + 1} / ${galleryData.length}</span>`;
+}
+
 function openLightbox(index) {
-  currentIndex = index;
-  updateLightbox();
+  buildSlides();
   lightbox.classList.add('active');
   lockScroll();
+  // 'auto': si apre già sulla foto toccata, senza farle scorrere davanti
+  // tutte quelle che la precedono.
+  requestAnimationFrame(() => goTo(index, 'auto'));
 }
 
 function closeLightbox() {
@@ -114,58 +160,45 @@ function closeLightbox() {
   unlockScroll();
 }
 
-function updateLightbox() {
-  const { src, caption } = galleryData[currentIndex];
-  lightboxContent.innerHTML = src
-    ? `<img src="${src}" alt="${caption}" />`
-    : `<div style="padding:3rem;color:#aaa;font-size:1rem;text-align:center;">📸<br/>${caption}<br/><small style="opacity:.5">Foto disponibile presto</small></div>`;
-  lightboxCaption.textContent = caption;
-}
+/* La foto in vista si ricava dalla posizione del nastro: con lo scatto
+   attivo il conto è esatto, e vale sia per il dito che per i tasti. */
+let lbTicking = false;
+lightboxContent.addEventListener('scroll', () => {
+  if (lbTicking) return;
+  lbTicking = true;
+  requestAnimationFrame(() => {
+    lbTicking = false;
+    setCaption(Math.round(lightboxContent.scrollLeft / slideStep()));
+  });
+}, { passive: true });
 
 galleryItems.forEach((item, i) => {
   item.addEventListener('click', () => openLightbox(i));
 });
 
 closeLB.addEventListener('click', closeLightbox);
+prevLB.addEventListener('click', () => goTo(currentIndex - 1));
+nextLB.addEventListener('click', () => goTo(currentIndex + 1));
 
-prevLB.addEventListener('click', () => {
-  currentIndex = (currentIndex - 1 + galleryData.length) % galleryData.length;
-  updateLightbox();
+/* Toccare accanto alla foto chiude. Sulla foto no: lì si trascina. */
+lightbox.addEventListener('click', (e) => {
+  if (e.target === lightbox || e.target.classList.contains('lightbox-slide')) {
+    closeLightbox();
+  }
 });
 
-nextLB.addEventListener('click', () => {
-  currentIndex = (currentIndex + 1) % galleryData.length;
-  updateLightbox();
-});
-
-lightbox.addEventListener('click', e => {
-  if (e.target === lightbox) closeLightbox();
-});
-
-document.addEventListener('keydown', e => {
+document.addEventListener('keydown', (e) => {
   if (!lightbox.classList.contains('active')) return;
   if (e.key === 'Escape') closeLightbox();
-  if (e.key === 'ArrowLeft') prevLB.click();
-  if (e.key === 'ArrowRight') nextLB.click();
+  if (e.key === 'ArrowLeft') goTo(currentIndex - 1);
+  if (e.key === 'ArrowRight') goTo(currentIndex + 1);
 });
 
-/* Swipe fra le foto: su telefono è il gesto che ci si aspetta, e i tasti
-   laterali restano come alternativa. */
-let touchStartX = 0;
-let touchStartY = 0;
-
-lightbox.addEventListener('touchstart', e => {
-  touchStartX = e.changedTouches[0].clientX;
-  touchStartY = e.changedTouches[0].clientY;
-}, { passive: true });
-
-lightbox.addEventListener('touchend', e => {
-  const dx = e.changedTouches[0].clientX - touchStartX;
-  const dy = e.changedTouches[0].clientY - touchStartY;
-  // Soglia + confronto con il movimento verticale: così un tocco fermo o un
-  // trascinamento in verticale non cambiano foto per sbaglio.
-  if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy)) return;
-  (dx < 0 ? nextLB : prevLB).click();
+/* Ruotando il telefono la larghezza cambia e il nastro resterebbe fermo fra
+   due foto: si rimette in quadro sulla foto corrente. */
+window.addEventListener('resize', () => {
+  if (!lightbox.classList.contains('active')) return;
+  lightboxContent.scrollTo({ left: currentIndex * slideStep(), behavior: 'auto' });
 }, { passive: true });
 
 /* ── GALLERIA: indicatore del carosello ─────────────── */
@@ -529,9 +562,18 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
   // Via San Giovanni 12, Molfetta — coordinate precise da Google Maps
   const LAT = 41.202644, LNG = 16.597426;
 
+  /* Zoom 18 inquadrava il civico: si vedeva il tetto e nient'altro, quindi
+     non si capiva dove fosse la casa rispetto a porto, centro e stazione —
+     che è l'unica cosa che interessa a chi deve prenotare. 16 tiene dentro
+     il quartiere; da telefono, con un riquadro più corto, si scende ancora
+     di un passo per abbracciare la stessa porzione di città. */
+  const ZOOM_WIDE = 16;
+  const ZOOM_PHONE = 15;
+  const startZoom = () => (isMobile() ? ZOOM_PHONE : ZOOM_WIDE);
+
   const map = L.map('interactive-map', {
     center: [LAT, LNG],
-    zoom: 18,
+    zoom: startZoom(),
     scrollWheelZoom: false,
     zoomControl: false,
     attributionControl: false,
@@ -646,8 +688,19 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
     hintTimer = setTimeout(() => hint.classList.remove('is-visible'), 1600);
   }
 
+  // Se l'utente ha già zoomato o spostato la mappa, la sua scelta vince:
+  // riportarla al valore di partenza a ogni rotazione dello schermo sarebbe
+  // un dispetto. Il flag cade al primo gesto sulla mappa.
+  let mapUntouched = true;
+  map.on('zoomstart movestart', () => { mapUntouched = false; });
+
   function syncMapGestures() {
     zoomCtl.setPosition(isMobile() ? 'topright' : 'bottomright');
+    if (mapUntouched) {
+      const z = startZoom();
+      if (map.getZoom() !== z) map.setView([LAT, LNG], z, { animate: false });
+      mapUntouched = true; // setView ha appena alzato il flag: lo rimetto
+    }
     if (isMobile()) {
       map.dragging.disable();
     } else {

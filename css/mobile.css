@@ -137,28 +137,39 @@
     padding: 0.75rem 1.25rem;
   }
 
-  /* ── About */
-  .about-grid { grid-template-columns: 1fr; gap: 2rem; }
-  /* Immagine principale: altezza esplicita, nessuna ambiguità */
+  /* ── L'Appartamento: stessa impaginazione delle foto città — una grande
+     sopra, due affiancate sotto. Prima le tre scendevano in colonna e
+     l'introduzione finiva sotto due schermate di immagini, quando è proprio
+     il testo che deve convincere chi legge. */
+  .about-grid { grid-template-columns: 1fr; gap: 1.75rem; }
+
+  .about-images { gap: 0.7rem; }
+
   .about-img-main { overflow: hidden; border-radius: var(--radius); }
   .about-img-main img {
     display: block;
     width: 100%;
-    height: 260px;
+    height: 250px;
     min-height: 0;
     object-fit: cover;
     object-position: center;
   }
-  /* Immagini secondarie */
-  .about-img-secondary { gap: 0.75rem; }
+
+  .about-img-secondary { gap: 0.7rem; }
   .about-img-secondary img {
     display: block;
     width: 100%;
-    height: 160px;
+    height: 170px;
     object-fit: cover;
     object-position: center;
     border-radius: var(--radius);
   }
+
+  /* Il testo viene prima delle foto: chi scorre incontra il titolo e il
+     racconto, e le immagini arrivano subito dopo a confermarli. */
+  .about-text { order: -1; padding: 0; }
+  .about-text .section-title { margin-bottom: 0.9rem; }
+
   .about-stats { grid-template-columns: repeat(2, 1fr); }
 
   /* ── Comfort: da riquadri alti a righe.
@@ -367,8 +378,7 @@
   .cal-hours { font-size: 0.73rem; }
 
   /* ── Lightbox: i comandi laterali coprivano la foto su schermo stretto */
-  .lightbox-content { max-width: calc(100vw - 1.5rem); max-height: 72vh; }
-  .lightbox-content img { max-width: calc(100vw - 1.5rem); max-height: 72vh; }
+  .lightbox-slide { padding: 4.5rem 0.9rem 7rem; }
   .lightbox-close {
     top: calc(0.75rem + env(safe-area-inset-top, 0px));
     right: 0.75rem;
@@ -424,9 +434,10 @@
   .hero-cta .btn { justify-content: center; min-height: 48px; }
   .badge { font-size: 0.78rem; padding: 0.35rem 0.8rem; }
 
-  /* ── About: immagini secondarie in colonna, altezza ridotta */
-  .about-img-secondary { grid-template-columns: 1fr; }
-  .about-img-secondary img { height: 180px; }
+  /* ── About: le due secondarie restano affiancate. In colonna facevano
+     620px di sole foto prima delle statistiche. */
+  .about-img-main img { height: 215px; }
+  .about-img-secondary img { height: 140px; }
   .about-stats { grid-template-columns: repeat(4, 1fr); gap: 0.4rem; }
   .stat-num { font-size: 1.5rem; }
   .stat-label { font-size: 0.62rem; letter-spacing: 0.04em; }
