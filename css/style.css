@@ -21,6 +21,10 @@
   --shadow-lg:    0 20px 60px rgba(13,33,55,0.18);
   --radius:       12px;
   --radius-lg:    20px;
+  /* Margine laterale unico per tutta la pagina. Ogni sezione lo eredita dal
+     .container: così i bordi restano allineati a qualsiasi larghezza invece di
+     spostarsi di qualche pixel da una sezione all'altra. */
+  --gutter:       clamp(1.15rem, 5vw, 3rem);
   --transition:   0.4s cubic-bezier(0.4, 0, 0.2, 1);
   --font-serif:   'Playfair Display', Georgia, serif;
   --font-sans:    'Inter', system-ui, sans-serif;
@@ -32,6 +36,14 @@
 html {
   scroll-behavior: smooth;
   font-size: 16px;
+  /* clip invece di hidden: taglia l'overflow orizzontale senza trasformare
+     l'elemento in un contenitore di scroll (hidden rompe position: sticky e su
+     iOS lascia comunque rimbalzare la pagina di lato). */
+  overflow-x: clip;
+  overscroll-behavior-x: none;
+  /* Safari iOS ingrandisce da solo il testo ruotando il telefono */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -39,10 +51,24 @@ body {
   color: var(--text);
   background: var(--cream);
   line-height: 1.7;
-  overflow-x: hidden;
+  overflow-x: clip;
+  overscroll-behavior-x: none;
+  width: 100%;
 }
 
-img { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* Blocco dello scorrimento quando menu o lightbox sono aperti: senza questo
+   la pagina continua a scorrere dietro all'overlay. */
+/* position:fixed è l'unico modo che ferma davvero lo scroll su iOS Safari.
+   L'offset `top` lo mette main.js, che poi ripristina la posizione. */
+body.no-scroll {
+  position: fixed;
+  left: 0;
+  right: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+img { display: block; width: 100%; max-width: 100%; height: 100%; object-fit: cover; }
 
 a { color: inherit; text-decoration: none; }
 
@@ -107,9 +133,14 @@ ul { list-style: none; }
 
 /* ── LAYOUT ─────────────────────────────────────────── */
 .container {
-  width: 90%;
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: calc(1200px + 2 * var(--gutter));
+  margin-inline: auto;
+  /* env(): sui telefoni con notch il contenuto in orizzontale resta fuori
+     dall'area coperta dalla fotocamera. */
+  padding-inline:
+    calc(var(--gutter) + env(safe-area-inset-left, 0px))
+    calc(var(--gutter) + env(safe-area-inset-right, 0px));
 }
 
 /* ── BUTTONS ────────────────────────────────────────── */
@@ -211,9 +242,12 @@ ul { list-style: none; }
 }
 
 .nav-container {
-  width: 90%;
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: calc(1200px + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-inline:
+    calc(var(--gutter) + env(safe-area-inset-left, 0px))
+    calc(var(--gutter) + env(safe-area-inset-right, 0px));
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -307,8 +341,12 @@ ul { list-style: none; }
 /* ── HERO ───────────────────────────────────────────── */
 .hero {
   position: relative;
+  /* svh = altezza con la barra degli indirizzi visibile. Con 100vh l'hero
+     cambia altezza ogni volta che la barra compare o sparisce e la pagina
+     sobbalza durante lo scroll. */
   height: 100vh;
-  min-height: 600px;
+  height: 100svh;
+  min-height: 34rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -342,8 +380,12 @@ ul { list-style: none; }
   z-index: 2;
   text-align: center;
   color: var(--white);
-  padding: 2rem;
-  max-width: 800px;
+  padding-inline:
+    calc(var(--gutter) + env(safe-area-inset-left, 0px))
+    calc(var(--gutter) + env(safe-area-inset-right, 0px));
+  padding-block: 2rem;
+  width: 100%;
+  max-width: calc(800px + 2 * var(--gutter));
 }
 
 .hero-location {
@@ -881,6 +923,7 @@ ul { list-style: none; }
   gap: 1rem;
   border: 1px solid rgba(0,0,0,0.05);
   white-space: nowrap;
+  max-width: calc(100% - 2 * var(--gutter));
 }
 .map-card-moon { width: 20px; height: 20px; color: var(--gold); flex-shrink: 0; }
 .map-card-text { display: flex; flex-direction: column; gap: 0.1rem; }
@@ -896,6 +939,28 @@ ul { list-style: none; }
   flex-shrink: 0;
 }
 .map-card-link:hover { color: var(--terra); }
+
+/* Avviso "due dita": compare solo se si prova a trascinare con un dito */
+.map-gesture-hint {
+  position: absolute;
+  inset: 0;
+  z-index: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(13,33,55,0.55);
+  color: var(--white);
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-align: center;
+  padding: 1rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+
+.map-gesture-hint.is-visible { opacity: 1; }
 
 /* Airbnb-style pulsing dot pin */
 .map-dot-wrap {
@@ -1504,3 +1569,23 @@ ul { list-style: none; }
 .delay-4 { transition-delay: 0.4s; }
 
 /* ── RESPONSIVE: see mobile.css ────────────────────── */
+
+/* ── PREFERENZA: MENO ANIMAZIONI ────────────────────── */
+/* Rispetta l'impostazione di sistema e, di riflesso, toglie proprio le
+   animazioni che su telefono costano di più. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .reveal-up,
+  .reveal-left,
+  .reveal-right { opacity: 1; transform: none; }
+
+  .marquee-track { animation: none; }
+  .city-photo-inner img { transform: scale(1); }
+}

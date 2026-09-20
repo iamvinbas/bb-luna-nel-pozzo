@@ -1,18 +1,69 @@
 /* ═══════════════════════════════════════════════════════
    LA LUNA NEL POZZO — Mobile CSS
    Solo breakpoint mobile. Desktop → style.css
+
+   Ordine dei breakpoint: 1024 → 768 → 480 → 380, più una regola
+   per il telefono in orizzontale. Le regole sono cumulative:
+   ogni soglia corregge solo ciò che cambia davvero.
 ═══════════════════════════════════════════════════════ */
+
+/* ── REGOLE VALIDE SU OGNI SCHERMO TOUCH ────────────── */
+/* Il puntatore grossolano è il dito: niente hover, bersagli più larghi. */
+@media (hover: none) {
+
+  /* Gli stati :hover su touch restano "appiccicati" dopo il tap: il
+     riquadro resta sollevato finché non si tocca altrove. Li annullo. */
+  .feature-card:hover,
+  .loc-chip:hover,
+  .contact-card:not(.disabled):hover,
+  .gallery-item:hover img,
+  .gallery-item:hover .img-placeholder,
+  .btn:hover,
+  .nav-cta:hover {
+    transform: none;
+  }
+
+  /* L'overlay della galleria compariva solo in hover: su touch non compare
+     mai, quindi le didascalie erano invisibili. */
+  .gallery-overlay {
+    opacity: 1;
+    background: linear-gradient(transparent 45%, rgba(13,33,55,0.72));
+  }
+
+  /* Bersagli tattili: 44px è il minimo raccomandato da Apple e Google. */
+  .nav-links a,
+  .footer-links a,
+  .footer-contact a,
+  .platform-link {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+/* ── TABLET E SOTTO (≤ 1024px) ──────────────────────── */
+@media (max-width: 1024px) {
+  /* Il parallasse delle foto città viene spento da main.js sotto i 768px:
+     qui tolgo lo zoom residuo così l'immagine non resta tagliata. */
+  .about-grid { gap: 3rem; }
+  .features-grid { grid-template-columns: repeat(2, 1fr); }
+}
 
 /* ── TABLET (≤ 768px) ───────────────────────────────── */
 @media (max-width: 768px) {
-
-  /* Container */
-  .container { width: 92%; }
 
   /* Sezioni — padding ridotto */
   .about, .features, .virtual-tour, .booking { padding: 4rem 0; }
   .gallery, .city, .location { padding-top: 4rem; }
   .section-header { margin-bottom: 2rem; }
+
+  /* ── Reveal: niente movimento orizzontale.
+       translateX(±40px) su blocchi larghi quanto lo schermo spingeva il
+       contenuto oltre il bordo prima dell'animazione: è da lì che la pagina
+       "ballava" di lato allo scroll. In verticale l'effetto resta identico
+       all'occhio e non tocca mai la larghezza. */
+  .reveal-left,
+  .reveal-right { transform: translateY(30px); }
 
   /* ── Nav: menu fullscreen */
   .nav-links {
@@ -23,16 +74,58 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 2.5rem;
+    gap: 2rem;
     z-index: 999;
+    /* Su schermi bassi (telefono in orizzontale) le voci non ci stanno:
+       meglio poterle scorrere che vederle tagliate. */
+    overflow-y: auto;
+    padding: 5rem 1.5rem calc(2rem + env(safe-area-inset-bottom, 0px));
   }
   .nav-links.open { display: flex; }
-  .nav-links a { font-size: 1.3rem; }
-  .hamburger { display: flex; z-index: 1000; }
+  .nav-links a { font-size: 1.25rem; padding: 0.35rem 1rem; }
+  .nav-links .nav-cta { padding: 0.7rem 2rem; }
+
+  .hamburger {
+    display: flex;
+    z-index: 1000;
+    /* Area toccabile 44×44 senza ingrandire le tre barrette */
+    width: 44px;
+    height: 44px;
+    justify-content: center;
+    align-items: center;
+    gap: 0;
+    position: relative;
+  }
+  .hamburger span {
+    position: absolute;
+    transition: transform 0.3s, opacity 0.2s;
+  }
+  .hamburger span:nth-child(1) { transform: translateY(-7px); }
+  .hamburger span:nth-child(3) { transform: translateY(7px); }
+  /* Croce a menu aperto: senza questo non si capisce come si chiude */
+  .hamburger.open span:nth-child(1) { transform: rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: rotate(-45deg); }
+
+  .nav-logo { min-height: 44px; }
+
+  /* Comandi zoom di Leaflet: 30px di default, troppo piccoli per un dito */
+  .leaflet-touch .leaflet-bar a {
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+  }
 
   /* ── Hero */
-  .hero-content { padding: 0 1.25rem; }
   .hero-badges { gap: 0.5rem; }
+  .hero-title { margin-bottom: 0.75rem; }
+  .hero-subtitle { margin-bottom: 1.5rem; }
+  /* La freccia in fondo va tenuta sopra la barra di sistema, e con un'area
+     toccabile vera intorno: la punta da sola è 24px. */
+  .hero-scroll-hint {
+    bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+    padding: 0.75rem 1.25rem;
+  }
 
   /* ── About */
   .about-grid { grid-template-columns: 1fr; gap: 2rem; }
@@ -42,6 +135,7 @@
     display: block;
     width: 100%;
     height: 260px;
+    min-height: 0;
     object-fit: cover;
     object-position: center;
   }
@@ -66,23 +160,24 @@
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 200px 200px 200px;
     gap: 3px;
+    margin-top: 2rem;
   }
   .gallery-item.gallery-item-large { grid-row: span 1; }
-  /* Overlay sempre visibile su touch (no hover) */
-  .gallery-overlay {
-    opacity: 1;
-    background: linear-gradient(transparent 40%, rgba(13,33,55,0.65));
-  }
 
   /* ── City photos */
-  .city-photos { grid-template-columns: 1fr; gap: 1.5rem; }
+  .city-photos { grid-template-columns: 1fr; gap: 1.5rem; margin-bottom: 2.5rem; }
   .city-photo:nth-child(1) .city-photo-inner,
   .city-photo-mid .city-photo-inner,
   .city-photo:nth-child(3) .city-photo-inner {
     height: 260px;
     margin-top: 0;
   }
+  /* Senza parallasse lo zoom 1.12 serve solo a tagliare la foto */
+  .city-photo-inner img { transform: none; }
+
   .marquee-track img { width: 220px; height: 140px; }
+  /* Meno pixel da spostare per fotogramma: scorrimento più fluido */
+  .marquee-track { animation-duration: 55s; }
 
   /* ── Mappa */
   .location-map-full { height: 360px; }
@@ -93,18 +188,39 @@
     bottom: 1rem;
     padding: 0.85rem 1.2rem;
     gap: 0.5rem;
+    /* nowrap + larghezza libera = scheda più larga dello schermo */
+    white-space: normal;
+    width: max-content;
+    max-width: calc(100% - 2 * var(--gutter));
   }
+  .map-card-text strong,
+  .map-card-text span { white-space: normal; }
   .map-card-link {
     border-left: none;
     padding-left: 0;
     border-top: 1px solid var(--cream-dark);
-    padding-top: 0.5rem;
+    padding-top: 0.6rem;
     width: 100%;
     text-align: center;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   /* ── Booking */
-  .booking-grid { grid-template-columns: 1fr; }
+  .booking-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .booking-form { padding: 1.5rem 1.25rem; }
+
+  /* Sotto i 16px iOS ingrandisce la pagina appena si tocca il campo, e al
+     ritorno resta storta di lato. 16px esatti = nessuno zoom. */
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 16px;
+    padding: 0.85rem 0.9rem;
+  }
+  .form-row { grid-template-columns: 1fr; gap: 0; }
 
   /* ── Calendario disponibilità: un mese, celle più toccabili */
   .availability { padding: 1.4rem 1.1rem 1.2rem; margin-bottom: 2rem; }
@@ -113,29 +229,69 @@
   .cal-legend { gap: 0.9rem; font-size: 0.72rem; }
   .cal { gap: 0.2rem; }
   .cal-months { gap: 0; }
-  .cal-nav { width: 34px; height: 34px; font-size: 1.2rem; }
-  .cal-day { font-size: 0.85rem; border-radius: 7px; }
+  .cal-nav {
+    width: 44px;
+    height: 44px;
+    font-size: 1.3rem;
+    /* Il tap non deve selezionare il numero né far comparire la lente */
+    -webkit-tap-highlight-color: transparent;
+  }
+  .cal-day {
+    font-size: 0.9rem;
+    border-radius: 7px;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
   .cal-status { margin-top: 1rem; padding-top: 1rem; font-size: 0.82rem; }
   .cal-hours { font-size: 0.73rem; }
-  .form-row { grid-template-columns: 1fr; }
+
+  /* ── Lightbox: i comandi laterali coprivano la foto su schermo stretto */
+  .lightbox-content { max-width: calc(100vw - 1.5rem); max-height: 72vh; }
+  .lightbox-content img { max-width: calc(100vw - 1.5rem); max-height: 72vh; }
+  .lightbox-close {
+    top: calc(0.75rem + env(safe-area-inset-top, 0px));
+    right: 0.75rem;
+  }
+  .lightbox-prev,
+  .lightbox-next {
+    top: auto;
+    transform: none;
+    bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+    width: 48px;
+    height: 48px;
+    font-size: 1.6rem;
+  }
+  .lightbox-prev { left: calc(50% - 4.25rem); }
+  .lightbox-next { right: calc(50% - 4.25rem); }
+  .lightbox-caption { bottom: calc(5.25rem + env(safe-area-inset-bottom, 0px)); }
 
   /* ── Banner */
   .banner-inner { flex-direction: column; text-align: center; gap: 1rem; }
+  .banner-text { align-items: center; }
 
   /* ── Footer */
   .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
   .footer-brand,
   .footer-links,
   .footer-contact { text-align: center; }
+  .footer-brand-name { justify-content: center; }
+  .footer-links ul,
+  .footer-contact ul { align-items: center; }
+  .footer { padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px)); }
 }
 
 /* ── SMARTPHONE (≤ 480px) ───────────────────────────── */
 @media (max-width: 480px) {
 
+  /* Margine laterale unico e un po' più stretto: sotto questa soglia
+     5vw lascerebbe meno di 24px di testo utile per riga. */
+  :root { --gutter: 1.15rem; }
+
   /* Sezioni — padding ancora ridotto */
   .about, .features, .virtual-tour, .booking { padding: 3rem 0; }
   .gallery, .city, .location { padding-top: 3rem; }
   .section-header { margin-bottom: 1.5rem; }
+  .section-desc { font-size: 1rem; }
 
   /* ── Hero */
   .hero-cta {
@@ -143,14 +299,15 @@
     align-items: stretch;
     gap: 0.75rem;
   }
-  .hero-cta .btn { justify-content: center; }
+  .hero-cta .btn { justify-content: center; min-height: 48px; }
+  .badge { font-size: 0.78rem; padding: 0.35rem 0.8rem; }
 
   /* ── About: immagini secondarie in colonna, altezza ridotta */
   .about-img-secondary { grid-template-columns: 1fr; }
   .about-img-secondary img { height: 180px; }
   .about-stats { grid-template-columns: repeat(4, 1fr); gap: 0.4rem; }
   .stat-num { font-size: 1.5rem; }
-  .stat-label { font-size: 0.62rem; }
+  .stat-label { font-size: 0.62rem; letter-spacing: 0.04em; }
 
   /* ── Features: una colonna */
   .features-grid { grid-template-columns: 1fr; }
@@ -166,14 +323,98 @@
 
   /* ── Location chips: 2 per riga */
   .location-chips { gap: 0.5rem; }
-  .loc-chip { flex: 1 1 calc(50% - 0.5rem); min-width: 130px; }
+  .loc-chip {
+    flex: 1 1 calc(50% - 0.5rem);
+    /* min-width fisso: sotto i ~290px di viewport due chip da 130px più il
+       gap superano la riga e spingono fuori il bordo. Con min-width:0 e
+       il testo che va a capo la riga si adatta sempre. */
+    min-width: 0;
+    padding: 0.6rem 0.9rem 0.6rem 0.7rem;
+  }
+  .loc-chip strong,
+  .loc-chip span { white-space: normal; }
 
   /* ── Contact cards */
   .contact-card { padding: 1rem 1rem; gap: 0.7rem; }
+  .contact-icon { font-size: 1.5rem; }
+  .contact-info strong { font-size: 0.95rem; }
+  .contact-info span { font-size: 0.8rem; }
 
   /* ── Platform links */
   .platform-links { flex-direction: column; align-items: center; gap: 0.6rem; }
+  .platform-link { width: 100%; max-width: 260px; text-align: center; }
 
   /* ── Virtual tour preview */
-  .tour-preview { flex-direction: column; padding: 1.5rem; }
+  .tour-preview { flex-direction: column; padding: 1.5rem; width: 100%; }
+
+  /* ── Calendario: le celle devono restare toccabili.
+     Con le frecce in fila accanto alla griglia si mangiavano 94px dei ~260
+     disponibili e i giorni scendevano a 20px di lato. Qui le frecce vanno
+     in sovrapposizione sulla riga del nome del mese e la griglia prende
+     tutta la larghezza. */
+  .availability { padding: 1.2rem 0.75rem 1rem; }
+
+  .cal {
+    display: grid;
+    grid-template-columns: 40px 1fr 40px;
+    gap: 0;
+  }
+  .cal-nav-prev { grid-column: 1; grid-row: 1; justify-self: start; }
+  .cal-nav-next { grid-column: 3; grid-row: 1; justify-self: end; }
+  .cal-nav {
+    width: 40px;
+    height: 40px;
+    align-self: start;
+    z-index: 1;
+  }
+  .cal-months {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+  .cal-month-name {
+    /* Spazio per non finire sotto le frecce */
+    padding-inline: 2.6rem;
+    margin-bottom: 1rem;
+    line-height: 40px;
+  }
+
+  .cal-weekdays,
+  .cal-grid { gap: 3px; }
+  .cal-hours { gap: 0.4rem 1rem; }
+  /* Il puntino separatore mandava le voci a capo storte su schermo stretto */
+  .cal-hours li + li::before { margin-right: 0.6rem; }
+}
+
+/* ── SMARTPHONE PICCOLI (≤ 380px) ───────────────────── */
+/* iPhone SE, Galaxy A d'ingresso e simili: qui i titoli grandi sono la
+   prima cosa che sfonda il bordo. */
+@media (max-width: 380px) {
+  :root { --gutter: 1rem; }
+
+  .hero-title { font-size: 2.6rem; }
+  .section-title { font-size: 1.75rem; }
+  .logo-text { font-size: 0.95rem; }
+
+  .about-stats { grid-template-columns: repeat(2, 1fr); gap: 0.8rem 0.4rem; }
+  .loc-chip { flex: 1 1 100%; }
+
+  .availability { padding: 1rem 0.5rem 0.9rem; }
+  .cal-day { font-size: 0.8rem; }
+  .cal-weekdays,
+  .cal-grid { gap: 2px; }
+  .cal-legend { gap: 0.7rem; font-size: 0.68rem; }
+  .availability-title h3 { font-size: 1.15rem; }
+
+  .marquee-track img { width: 180px; height: 115px; }
+}
+
+/* ── TELEFONO IN ORIZZONTALE ────────────────────────── */
+/* Poche centinaia di pixel in altezza: un hero a tutto schermo non lascia
+   vedere nulla e il menu fullscreen taglia le voci. */
+@media (max-width: 900px) and (max-height: 500px) and (orientation: landscape) {
+  .hero { height: auto; min-height: 0; padding: 6rem 0 4rem; }
+  .hero-scroll-hint { display: none; }
+  .nav-links { gap: 1rem; justify-content: flex-start; }
+  .nav-links a { font-size: 1.05rem; }
+  .location-map-full { height: 300px; }
 }

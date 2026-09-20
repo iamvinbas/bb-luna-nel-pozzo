@@ -2,27 +2,76 @@
    LA LUNA NEL POZZO — Main JS
 ═══════════════════════════════════════════════════════ */
 
+/* ── AMBIENTE ───────────────────────────────────────── */
+/* Una sola definizione di "siamo su mobile", usata da parallasse, mappa e
+   lightbox: la soglia coincide con il breakpoint di mobile.css. */
+const mqMobile  = window.matchMedia('(max-width: 768px)');
+const mqReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+const isMobile  = () => mqMobile.matches;
+
+/* Blocco scroll di sfondo (menu, lightbox).
+   position:fixed sul body perde la posizione di scroll: la salvo e la
+   ripristino, altrimenti chiudendo l'overlay si torna in cima alla pagina. */
+let scrollLockY = 0;
+let scrollLocks = 0;
+
+function lockScroll() {
+  if (++scrollLocks > 1) return;
+  scrollLockY = window.scrollY;
+  document.body.style.top = `-${scrollLockY}px`;
+  document.body.classList.add('no-scroll');
+}
+
+function unlockScroll() {
+  if (scrollLocks === 0 || --scrollLocks > 0) return;
+  document.body.classList.remove('no-scroll');
+  document.body.style.top = '';
+  // behavior:'instant' scavalca lo `scroll-behavior: smooth` dell'html:
+  // altrimenti la pagina riparte da zero e risale scorrendo sotto gli occhi.
+  window.scrollTo({ top: scrollLockY, left: 0, behavior: 'instant' });
+}
+
 /* ── NAVBAR: scroll behavior + mobile menu ──────────── */
 const navbar   = document.getElementById('navbar');
 const hamburger = document.getElementById('hamburger');
 const navLinks  = document.querySelector('.nav-links');
 
+/* Lo scroll su mobile arriva a raffica: senza rAF il listener gira decine di
+   volte per fotogramma e legge il layout ogni volta. */
+let navTicking = false;
 window.addEventListener('scroll', () => {
-  navbar.classList.toggle('scrolled', window.scrollY > 60);
+  if (navTicking) return;
+  navTicking = true;
+  requestAnimationFrame(() => {
+    navbar.classList.toggle('scrolled', window.scrollY > 60);
+    navTicking = false;
+  });
 }, { passive: true });
 
+function setMenu(open) {
+  if (navLinks.classList.contains('open') === open) return;
+  navLinks.classList.toggle('open', open);
+  hamburger.classList.toggle('open', open);
+  hamburger.setAttribute('aria-expanded', String(open));
+  open ? lockScroll() : unlockScroll();
+}
+
 hamburger.addEventListener('click', () => {
-  navLinks.classList.toggle('open');
-  hamburger.classList.toggle('open');
+  setMenu(!navLinks.classList.contains('open'));
 });
 
 // Close mobile menu when nav link clicked
 navLinks.querySelectorAll('a').forEach(link => {
-  link.addEventListener('click', () => {
-    navLinks.classList.remove('open');
-    hamburger.classList.remove('open');
-  });
+  link.addEventListener('click', () => setMenu(false));
 });
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') setMenu(false);
+});
+
+// Passando a desktop il menu fullscreen sparisce ma il blocco scroll no:
+// la pagina resterebbe ferma senza che si veda il perché.
+mqMobile.addEventListener('change', e => { if (!e.matches) setMenu(false); });
 
 /* ── SCROLL REVEAL ──────────────────────────────────── */
 const revealObserver = new IntersectionObserver((entries) => {
@@ -56,12 +105,13 @@ function openLightbox(index) {
   currentIndex = index;
   updateLightbox();
   lightbox.classList.add('active');
-  document.body.style.overflow = 'hidden';
+  lockScroll();
 }
 
 function closeLightbox() {
+  if (!lightbox.classList.contains('active')) return;
   lightbox.classList.remove('active');
-  document.body.style.overflow = '';
+  unlockScroll();
 }
 
 function updateLightbox() {
@@ -98,6 +148,25 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft') prevLB.click();
   if (e.key === 'ArrowRight') nextLB.click();
 });
+
+/* Swipe fra le foto: su telefono è il gesto che ci si aspetta, e i tasti
+   laterali restano come alternativa. */
+let touchStartX = 0;
+let touchStartY = 0;
+
+lightbox.addEventListener('touchstart', e => {
+  touchStartX = e.changedTouches[0].clientX;
+  touchStartY = e.changedTouches[0].clientY;
+}, { passive: true });
+
+lightbox.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  // Soglia + confronto con il movimento verticale: così un tocco fermo o un
+  // trascinamento in verticale non cambiano foto per sbaglio.
+  if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy)) return;
+  (dx < 0 ? nextLB : prevLB).click();
+}, { passive: true });
 
 /* ── BOOKING FORM → WhatsApp ────────────────────────── */
 const form = document.getElementById('inquiry-form');
@@ -164,9 +233,15 @@ function showFormError(msg, duration = 3500) {
 }
 
 /* ── CITY PHOTO PARALLAX ────────────────────────────── */
+/* Su desktop è un effetto; su telefono è una scrittura di transform a ogni
+   evento di scroll, cioè proprio il carico che fa scattare lo scorrimento.
+   Sotto i 768px l'effetto è spento e le foto restano ferme. */
 const cityParallaxEls = document.querySelectorAll('[data-parallax]');
 
-function updateCityParallax() {
+let parallaxTicking = false;
+
+function applyCityParallax() {
+  parallaxTicking = false;
   cityParallaxEls.forEach(el => {
     const rate = parseFloat(el.dataset.parallax);
     const inner = el.querySelector('.city-photo-inner');
@@ -179,10 +254,33 @@ function updateCityParallax() {
   });
 }
 
-if (cityParallaxEls.length) {
-  window.addEventListener('scroll', updateCityParallax, { passive: true });
-  updateCityParallax();
+function onParallaxScroll() {
+  if (parallaxTicking) return;
+  parallaxTicking = true;
+  requestAnimationFrame(applyCityParallax);
 }
+
+function clearCityParallax() {
+  cityParallaxEls.forEach(el => {
+    const img = el.querySelector('img');
+    if (img) img.style.transform = '';
+  });
+}
+
+function syncParallax() {
+  const on = cityParallaxEls.length && !isMobile() && !mqReduced.matches;
+  window.removeEventListener('scroll', onParallaxScroll);
+  if (on) {
+    window.addEventListener('scroll', onParallaxScroll, { passive: true });
+    applyCityParallax();
+  } else {
+    clearCityParallax();
+  }
+}
+
+syncParallax();
+mqMobile.addEventListener('change', syncParallax);
+mqReduced.addEventListener('change', syncParallax);
 
 /* ── SMOOTH SCROLL for anchor links ────────────────── */
 document.querySelectorAll('a[href^="#"]').forEach(link => {
@@ -269,8 +367,11 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
 
   useProvider(0);
 
-  // Zoom controls bottom-right (Airbnb style)
-  L.control.zoom({ position: 'bottomright' }).addTo(map);
+  /* Zoom in basso a destra come su Airbnb; su telefono la scheda con
+     l'indirizzo occupa quell'angolo, quindi i comandi salgono in alto. */
+  const zoomCtl = L.control
+    .zoom({ position: isMobile() ? 'topright' : 'bottomright' })
+    .addTo(map);
 
   // Airbnb-style pulsing dot icon
   const dotIcon = L.divIcon({
@@ -294,9 +395,56 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
   // Force recalc — fixes white tile on file://
   setTimeout(() => map.invalidateSize(), 250);
 
+  // Il riquadro cambia altezza fra breakpoint: senza ricalcolo Leaflet
+  // continua a disegnare le tile per la dimensione vecchia.
+  window.addEventListener('resize', () => map.invalidateSize(), { passive: true });
+
   // Scroll zoom: enable on click, disable on leave
   mapEl.addEventListener('click', () => map.scrollWheelZoom.enable());
   mapEl.addEventListener('mouseleave', () => map.scrollWheelZoom.disable());
+
+  /* Su telefono la mappa occupa tutta la larghezza: un dito che scorre sopra
+     trascinava la mappa invece della pagina, e lo scroll si bloccava lì.
+     Un dito = scorri la pagina, due dita = muovi la mappa. */
+  const hint = document.createElement('div');
+  hint.className = 'map-gesture-hint';
+  hint.textContent = 'Usa due dita per muovere la mappa';
+  hint.setAttribute('aria-hidden', 'true');
+  mapEl.appendChild(hint);
+
+  let hintTimer;
+  function showHint() {
+    hint.classList.add('is-visible');
+    clearTimeout(hintTimer);
+    hintTimer = setTimeout(() => hint.classList.remove('is-visible'), 1600);
+  }
+
+  function syncMapGestures() {
+    zoomCtl.setPosition(isMobile() ? 'topright' : 'bottomright');
+    if (isMobile()) {
+      map.dragging.disable();
+    } else {
+      map.dragging.enable();
+      hint.classList.remove('is-visible');
+    }
+  }
+
+  mapEl.addEventListener('touchstart', e => {
+    if (!isMobile()) return;
+    if (e.touches.length >= 2) {
+      map.dragging.enable();
+    } else {
+      map.dragging.disable();
+      showHint();
+    }
+  }, { passive: true });
+
+  mapEl.addEventListener('touchend', () => {
+    if (isMobile()) map.dragging.disable();
+  }, { passive: true });
+
+  syncMapGestures();
+  mqMobile.addEventListener('change', syncMapGestures);
 })();
 
 /* ── SET min date for date inputs to today ──────────── */
