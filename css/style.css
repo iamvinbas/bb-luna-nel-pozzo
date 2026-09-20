@@ -187,7 +187,18 @@ ul { list-style: none; }
 }
 
 .btn-sm { padding: 0.6rem 1.4rem; font-size: 0.85rem; }
-.btn-full { width: 100%; justify-content: center; }
+
+/* Un bottone a tutta riga non ha motivo di restare su una riga sola: con
+   nowrap la sua larghezza minima ("Invia richiesta via WhatsApp" più 4rem di
+   imbottitura, 277px) diventava il pavimento della colonna, e su schermi da
+   320px il riquadro della prenotazione usciva dal bordo. */
+.btn-full {
+  width: 100%;
+  justify-content: center;
+  white-space: normal;
+  text-align: center;
+  padding-inline: 1.25rem;
+}
 
 /* ── IMAGE PLACEHOLDERS (remove when real photos added) */
 .img-placeholder {
@@ -526,7 +537,7 @@ ul { list-style: none; }
 
 .about-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 5rem;
   align-items: center;
 }
@@ -1073,7 +1084,7 @@ ul { list-style: none; }
 
 .booking-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 3rem;
   align-items: start;
   margin-top: 0;
@@ -1126,6 +1137,10 @@ ul { list-style: none; }
 .contact-info span {
   color: rgba(255,255,255,0.55);
   font-size: 0.85rem;
+  /* "lalunanelpozzo.molfetta@gmail.com" non ha spazi: senza permesso di
+     spezzarla, la sua larghezza intera diventava la larghezza minima della
+     colonna e spingeva fuori tutto il blocco. */
+  overflow-wrap: anywhere;
 }
 
 .contact-whatsapp:not(.disabled):hover { border-color: #25D366; }
@@ -1421,7 +1436,11 @@ ul { list-style: none; }
 
 .form-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* minmax(0, 1fr) e non 1fr: una traccia 1fr non scende sotto la larghezza
+     minima del contenuto, e un campo data ha una larghezza minima propria,
+     dettata dal testo "gg/mm/aaaa" più l'icona del calendario. Con 1fr la
+     colonna si allargava per contenerlo e il campo usciva dal riquadro. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 1rem;
 }
 
@@ -1430,6 +1449,8 @@ ul { list-style: none; }
   flex-direction: column;
   gap: 0.5rem;
   margin-bottom: 1.2rem;
+  /* Stessa ragione: un elemento di griglia parte da min-width: auto */
+  min-width: 0;
 }
 
 .form-group label {
@@ -1452,6 +1473,52 @@ ul { list-style: none; }
   transition: border-color 0.2s;
   outline: none;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  display: block;
+}
+
+/* ── CAMPI DATA ──
+   Safari su iPhone dà al campo data una larghezza propria, calcolata sul
+   testo della data nella lingua del telefono più l'icona, e la tratta come
+   invalicabile: con width:100% il campo restava comunque più largo del
+   riquadro e ne usciva dal bordo. Togliendo l'aspetto nativo il campo torna
+   una casella normale che sta nello spazio che gli si dà. Misure e colori
+   li rimettiamo noi, altrimenti su iOS il campo collassa in altezza. */
+.form-group input[type="date"] {
+  -webkit-appearance: none;
+  appearance: none;
+  /* Senza, su iOS il valore resta incollato al centro del campo */
+  text-align: left;
+  /* iOS non ricava l'altezza dal padding sui campi data */
+  min-height: 3rem;
+  line-height: 1.25;
+}
+
+/* Il valore dentro al campo, su WebKit, è un elemento a sé */
+.form-group input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
+  margin: 0;
+}
+
+/* L'icona del calendario: la teniamo, ma chiara sul fondo scuro e senza
+   che contribuisca alla larghezza minima del campo */
+.form-group input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 0.45;
+  cursor: pointer;
+  margin-left: auto;
+  padding-left: 0.4rem;
+}
+
+.form-group input[type="date"]:focus::-webkit-calendar-picker-indicator {
+  opacity: 0.8;
+}
+
+/* Un campo data vuoto su iOS mostra comunque il segnaposto della data:
+   lo allineiamo al resto in modo che non sembri un campo già compilato. */
+.form-group input[type="date"]:not(:focus):invalid::-webkit-datetime-edit {
+  color: rgba(255,255,255,0.3);
 }
 
 .form-group input::placeholder,

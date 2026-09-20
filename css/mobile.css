@@ -141,7 +141,7 @@
      sopra, due affiancate sotto. Prima le tre scendevano in colonna e
      l'introduzione finiva sotto due schermate di immagini, quando è proprio
      il testo che deve convincere chi legge. */
-  .about-grid { grid-template-columns: 1fr; gap: 1.75rem; }
+  .about-grid { grid-template-columns: minmax(0, 1fr); gap: 1.75rem; }
 
   .about-images { gap: 0.7rem; }
 
@@ -339,7 +339,7 @@
   }
 
   /* ── Booking */
-  .booking-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .booking-grid { grid-template-columns: minmax(0, 1fr); gap: 2rem; }
   .booking-form { padding: var(--card-pad) calc(var(--card-pad) - 0.25rem); }
 
   /* Sotto i 16px iOS ingrandisce la pagina appena si tocca il campo, e al
@@ -350,7 +350,7 @@
     font-size: 16px;
     padding: 0.85rem 0.9rem;
   }
-  .form-row { grid-template-columns: 1fr; gap: 0; }
+  .form-row { grid-template-columns: minmax(0, 1fr); gap: 0; }
 
   /* ── Calendario disponibilità: un mese, celle più toccabili.
      È l'unico riquadro che si scosta da --card-pad: ogni millimetro tolto ai
