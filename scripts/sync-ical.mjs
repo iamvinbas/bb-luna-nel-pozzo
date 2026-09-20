@@ -294,8 +294,24 @@ async function main() {
   await writeFile(resolve(ROOT, 'calendar/direct.ics'), buildDirectICS(direct));
 
   /* ── report ── */
+  // `::warning::` diventa un'annotazione visibile nella pagina del run.
+  // Serve perché una sorgente muta è il guasto peggiore di tutti: il run
+  // resta verde, il sito continua a promettere "sincronizzato con X" e le
+  // date vendute su quella piattaforma restano offerte come libere.
+  const gha = Boolean(process.env.GITHUB_ACTIONS);
+  const warn = (msg) => console.log(gha ? `::warning::${msg}` : `⚠ ${msg}`);
+
   for (const s of remote) {
-    console.log(s.ok ? `✔ ${s.label}: ${s.events.length} eventi` : `✖ ${s.label}: ${s.error}`);
+    if (s.ok) {
+      console.log(`✔ ${s.label}: ${s.events.length} eventi`);
+      continue;
+    }
+    console.log(`✖ ${s.label}: ${s.error}`);
+    warn(
+      `${s.label} non sincronizza (${s.error}). Le prenotazioni ricevute su ` +
+      `${s.label} NON bloccano le date sul sito: rischio doppia prenotazione. ` +
+      `Aggiungi l'URL di export iCal nel secret corrispondente.`,
+    );
   }
   console.log(`• Dirette: ${direct.length}`);
   console.log(`• Notti occupate: ${nights.size} in ${availability.ranges.length} intervalli`);

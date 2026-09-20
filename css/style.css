@@ -1570,6 +1570,70 @@ ul { list-style: none; }
 
 /* ── RESPONSIVE: see mobile.css ────────────────────── */
 
+/* ── ERRORI DEL FORM ────────────────────────────────── */
+/* Riepilogo in cima: dice quanti campi mancano. Il dettaglio sta sotto
+   ciascun campo, dove serve davvero. */
+.form-error {
+  background: rgba(255,107,107,0.12);
+  border: 1px solid rgba(255,107,107,0.35);
+  border-radius: 8px;
+  color: #ff9d9d;
+  font-size: 0.85rem;
+  padding: 0.7rem 0.9rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.form-error a { color: var(--gold); text-decoration: underline; }
+
+.field-error {
+  color: #ff9d9d;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  margin-top: 0.1rem;
+}
+
+/* Il bordo rosso non basta da solo: chi non distingue i colori vede solo un
+   campo identico agli altri. Il testo sotto è il segnale vero, il bordo lo
+   accompagna. */
+.form-group.has-error input,
+.form-group.has-error select,
+.form-group.has-error textarea {
+  border-color: #ff6b6b;
+  background: rgba(255,107,107,0.07);
+}
+
+.form-group.has-error label { color: #ff9d9d; }
+
+/* ── FRESCHEZZA DEL CALENDARIO ──────────────────────── */
+#cal-sources.is-warn { color: var(--gold-light); }
+
+#cal-updated.is-stale {
+  color: var(--gold-light);
+}
+
+/* Lampeggio breve quando arrivano dati nuovi a pagina aperta: senza, un
+   cambio di disponibilità avverrebbe in silenzio sotto gli occhi. */
+@keyframes cal-updated-flash {
+  0%   { color: var(--gold); }
+  100% { color: inherit; }
+}
+
+#cal-updated.just-updated { animation: cal-updated-flash 2s ease-out; }
+
+/* Salto al primo periodo libero, dentro la riga di stato */
+.cal-jump {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--gold);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.cal-jump:hover { color: var(--gold-light); }
+
 /* ── PREFERENZA: MENO ANIMAZIONI ────────────────────── */
 /* Rispetta l'impostazione di sistema e, di riflesso, toglie proprio le
    animazioni che su telefono costano di più. */

@@ -169,44 +169,198 @@ lightbox.addEventListener('touchend', e => {
 }, { passive: true });
 
 /* ── BOOKING FORM → WhatsApp ────────────────────────── */
+/* Il form ha `novalidate`: la validazione nativa è disattivata perché i suoi
+   messaggi non sono traducibili né posizionabili. Quindi la facciamo tutta
+   qui, campo per campo — prima c'era solo un controllo "non è vuoto" e una
+   email come "mario" passava dritta a WhatsApp. */
 const form = document.getElementById('inquiry-form');
 
-form.addEventListener('submit', e => {
+const FIELDS = ['name', 'email', 'checkin', 'checkout'];
+
+/* Volutamente permissiva: deve scartare gli errori di battitura evidenti
+   ("mario", "mario@", "mario@casa"), non arbitrare quali domini esistano. */
+const EMAIL_RE = /^[^\s@]+@[^\s@.]+(\.[^\s@.]+)+$/;
+
+const DAY_MS = 86400000;
+const parseDay = (iso) => {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '');
+  return m ? Date.UTC(+m[1], +m[2] - 1, +m[3]) : NaN;
+};
+const todayUTC = () => {
+  const n = new Date();
+  return Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate());
+};
+const fmtDay = (iso) =>
+  new Date(parseDay(iso)).toLocaleDateString('it-IT', {
+    day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC',
+  });
+
+/** Messaggio d'errore per un campo, oppure null se va bene. */
+function validateField(id) {
+  const el = form.elements[id];
+  const value = (el.value || '').trim();
+
+  switch (id) {
+    case 'name':
+      if (!value) return 'Serve il tuo nome per la richiesta.';
+      if (value.length < 2) return 'Scrivi il nome per esteso.';
+      return null;
+
+    case 'email':
+      if (!value) return 'Serve la tua email per risponderti.';
+      if (!EMAIL_RE.test(value)) return 'Controlla la email: manca qualcosa (esempio: mario@email.com).';
+      return null;
+
+    case 'checkin': {
+      if (!value) return 'Scegli il giorno di arrivo.';
+      const d = parseDay(value);
+      if (Number.isNaN(d)) return 'Data di arrivo non valida.';
+      if (d < todayUTC()) return 'La data di arrivo è già passata.';
+      return null;
+    }
+
+    case 'checkout': {
+      if (!value) return 'Scegli il giorno di partenza.';
+      const d = parseDay(value);
+      if (Number.isNaN(d)) return 'Data di partenza non valida.';
+      const a = parseDay(form.elements.checkin.value);
+      if (!Number.isNaN(a)) {
+        if (d <= a) return 'La partenza deve venire dopo l’arrivo.';
+        const nights = (d - a) / DAY_MS;
+        const min = window.LunaAvailability?.minNights ?? 2;
+        if (nights < min) {
+          return `Il soggiorno minimo è di ${min} notti: scegli almeno il ${fmtDay(
+            new Date(a + min * DAY_MS).toISOString().slice(0, 10),
+          )}.`;
+        }
+      }
+      return null;
+    }
+
+    default:
+      return null;
+  }
+}
+
+/** Mostra o toglie l'errore sotto un campo. */
+function setFieldError(id, message) {
+  const el = form.elements[id];
+  const group = el.closest('.form-group');
+  if (!group) return;
+
+  let hint = group.querySelector('.field-error');
+
+  if (!message) {
+    el.removeAttribute('aria-invalid');
+    el.removeAttribute('aria-describedby');
+    group.classList.remove('has-error');
+    hint?.remove();
+    return;
+  }
+
+  if (!hint) {
+    hint = document.createElement('p');
+    hint.className = 'field-error';
+    hint.id = `${id}-error`;
+    // Solo aria-live, non role=alert: role=alert interrompe lo screen reader
+    // a ogni tasto premuto mentre si corregge il campo.
+    hint.setAttribute('aria-live', 'polite');
+    group.appendChild(hint);
+  }
+  hint.textContent = message;
+  el.setAttribute('aria-invalid', 'true');
+  el.setAttribute('aria-describedby', hint.id);
+  group.classList.add('has-error');
+}
+
+function clearAllErrors() {
+  FIELDS.forEach((id) => setFieldError(id, null));
+  formError.hidden = true;
+  formError.textContent = '';
+}
+
+/** Riepilogo in cima al form: dice quanti campi mancano e dove guardare. */
+const formError = document.createElement('p');
+formError.className = 'form-error';
+formError.setAttribute('role', 'alert');
+formError.hidden = true;
+form.prepend(formError);
+
+function showFormError(msg) {
+  formError.textContent = msg;
+  formError.hidden = false;
+}
+
+/* Correggere un campo deve togliere subito il suo errore: lasciarlo lì
+   mentre si scrive fa credere che la correzione non sia stata registrata. */
+FIELDS.forEach((id) => {
+  const el = form.elements[id];
+  const revalidate = () => {
+    if (el.getAttribute('aria-invalid') !== 'true') return;
+    const err = validateField(id);
+    setFieldError(id, err);
+    if (!err && !FIELDS.some((f) => validateField(f))) {
+      formError.hidden = true;
+    }
+  };
+  el.addEventListener('input', revalidate);
+  el.addEventListener('change', revalidate);
+  // blur: primo controllo su un campo appena lasciato, così l'errore si vede
+  // prima del submit. Eccezione: se si sta andando proprio sul bottone di
+  // invio non si tocca nulla — inserire una riga d'errore qui allunga il form
+  // e sposta il bottone da sotto il dito, facendo mancare il tocco. Tanto è
+  // il submit stesso, subito dopo, a validare tutto.
+  el.addEventListener('blur', (e) => {
+    if (e.relatedTarget?.type === 'submit') return;
+    if (el.value.trim()) setFieldError(id, validateField(id));
+  });
+});
+
+form.addEventListener('submit', (e) => {
   e.preventDefault();
+  clearAllErrors();
 
-  const name     = form.name.value.trim();
-  const guests   = form.guests.value;
-  const checkin  = form.checkin.value;
-  const checkout = form.checkout.value;
-  const email    = form.email.value.trim();
-  const message  = form.message.value.trim();
+  const problems = FIELDS.map((id) => [id, validateField(id)]).filter(([, m]) => m);
 
-  if (!name || !checkin || !checkout || !email) {
-    showFormError('Compila tutti i campi obbligatori.');
+  if (problems.length) {
+    problems.forEach(([id, m]) => setFieldError(id, m));
+    const [firstId] = problems[0];
+    showFormError(
+      problems.length === 1
+        ? 'Manca un dato: controlla il campo evidenziato.'
+        : `Mancano ${problems.length} dati: controlla i campi evidenziati.`,
+    );
+    const first = form.elements[firstId];
+    first.focus({ preventScroll: true });
+    first.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return;
   }
 
-  if (new Date(checkout) <= new Date(checkin)) {
-    showFormError('La data di partenza deve essere dopo quella di arrivo.');
-    return;
-  }
+  const checkin = form.elements.checkin.value;
+  const checkout = form.elements.checkout.value;
 
   // Ultimo controllo contro il calendario sincronizzato: evita che una
   // richiesta parta per date già occupate su Airbnb o Booking.com.
   const avail = window.LunaAvailability?.check(checkin, checkout);
   if (avail && !avail.ok) {
-    showFormError(avail.reason, 8000);
+    setFieldError('checkin', avail.reason);
+    showFormError('Quelle date non sono libere — scegline altre sul calendario.');
+    window.LunaAvailability?.scrollToCalendar();
     return;
   }
 
-  const nights = Math.ceil((new Date(checkout) - new Date(checkin)) / 86400000);
-  const fmt = d => new Date(d).toLocaleDateString('it-IT', { day:'2-digit', month:'long', year:'numeric' });
+  const name = form.elements.name.value.trim();
+  const email = form.elements.email.value.trim();
+  const guests = form.elements.guests.value;
+  const message = form.elements.message.value.trim();
+  const nights = Math.round((parseDay(checkout) - parseDay(checkin)) / DAY_MS);
+  const times = window.LunaAvailability?.times ?? { checkinFrom: '15:00', checkoutBy: '11:00' };
 
   const waText = encodeURIComponent(
     `Ciao! Vorrei prenotare *La Luna nel Pozzo* a Molfetta 🌙\n\n` +
     `👤 Nome: ${name}\n` +
-    `📅 Arrivo: ${fmt(checkin)} (dalle 15:00)\n` +
-    `📅 Partenza: ${fmt(checkout)} (entro le 11:00)\n` +
+    `📅 Arrivo: ${fmtDay(checkin)} (dalle ${times.checkinFrom})\n` +
+    `📅 Partenza: ${fmtDay(checkout)} (entro le ${times.checkoutBy})\n` +
     `🌙 Notti: ${nights}\n` +
     `👥 Ospiti: ${guests}\n` +
     `✉️ Email: ${email}` +
@@ -215,22 +369,26 @@ form.addEventListener('submit', e => {
   );
 
   const waNumber = '393299866890';
-  window.open(`https://wa.me/${waNumber}?text=${waText}`, '_blank');
-});
+  // Niente 'noopener' fra le windowFeatures: con quello window.open torna
+  // sempre null per specifica, e non si distinguerebbe più l'apertura
+  // riuscita da un pop-up bloccato. Si stacca il riferimento dopo.
+  const win = window.open(`https://wa.me/${waNumber}?text=${waText}`, '_blank');
+  if (win) win.opener = null;
 
-let formErrorTimer;
-function showFormError(msg, duration = 3500) {
-  let err = form.querySelector('.form-error');
-  if (!err) {
-    err = document.createElement('p');
-    err.className = 'form-error';
-    err.style.cssText = 'color:#ff6b6b;font-size:.85rem;margin-bottom:.8rem;text-align:center;';
-    form.prepend(err);
+  // Se il browser blocca il pop-up la richiesta sparisce nel nulla senza che
+  // l'utente se ne accorga: meglio dargli un link da toccare.
+  if (!win) {
+    showFormError('Il browser ha bloccato l’apertura di WhatsApp.');
+    formError.insertAdjacentHTML(
+      'beforeend',
+      ` <a href="https://wa.me/${waNumber}?text=${waText}" target="_blank" rel="noopener">Apri WhatsApp</a>`,
+    );
+    return;
   }
-  err.textContent = msg;
-  clearTimeout(formErrorTimer);
-  formErrorTimer = setTimeout(() => err.remove(), duration);
-}
+
+  form.querySelector('.form-note').textContent =
+    'Richiesta aperta in WhatsApp — premi invio lì per mandarcela.';
+});
 
 /* ── CITY PHOTO PARALLAX ────────────────────────────── */
 /* Su desktop è un effetto; su telefono è una scrittura di transform a ogni
