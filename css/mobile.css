@@ -212,26 +212,87 @@
     color: rgba(255,255,255,0.5);
   }
 
-  /* ── Gallery:
-       grid-template-rows espliciti → le img position:absolute trovano il contenitore */
+  /* ── Galleria: da griglia a carosello.
+     Sei foto impilate erano quasi due schermate di scorrimento verticale per
+     guardare un appartamento. Qui scorrono di lato una alla volta, a scatto,
+     con un pezzo della successiva in vista che dice da sé cosa fare. Lo
+     scorrimento è nativo del browser: nessuna animazione in JavaScript da
+     far girare mentre il dito è sullo schermo. */
   .gallery-grid {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 200px 200px 200px;
-    gap: 3px;
-    margin-top: 2rem;
+    display: flex;
+    grid-template-columns: none;
+    grid-template-rows: none;
+    gap: 0.6rem;
+    margin-top: 1.75rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    /* Allinea la prima foto al margine del resto della pagina */
+    padding-inline: var(--gutter);
+    scroll-padding-inline: var(--gutter);
+    padding-block: 0.25rem;
+    -webkit-overflow-scrolling: touch;
+    /* Arrivati in fondo lo scorrimento non deve passare alla pagina sotto */
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
   }
-  .gallery-item.gallery-item-large { grid-row: span 1; }
+  .gallery-grid::-webkit-scrollbar { display: none; }
 
-  /* ── City photos */
-  .city-photos { grid-template-columns: 1fr; gap: 1.5rem; margin-bottom: 2.5rem; }
-  .city-photo:nth-child(1) .city-photo-inner,
-  .city-photo-mid .city-photo-inner,
-  .city-photo:nth-child(3) .city-photo-inner {
-    height: 260px;
-    margin-top: 0;
+  .gallery-item,
+  .gallery-item.gallery-item-large {
+    flex: 0 0 86%;
+    height: 300px;
+    grid-row: auto;
+    scroll-snap-align: start;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
   }
+
+  /* Le foto oltre la prima stanno fuori dallo schermo di lato, quindi
+     l'osservatore che gestisce le comparse non le vedrebbe mai apparire e
+     resterebbero riquadri vuoti. Nel carosello si entra già visibili. */
+  .gallery-item.reveal-up {
+    opacity: 1;
+    transform: none;
+  }
+
+  .gallery-overlay { padding: 2rem 1.1rem 1rem; }
+
+  .gallery-nav { display: flex; }
+
+  /* 4rem sotto al titolo erano un buco di mezzo schermo prima delle foto */
+  .city-header { margin-bottom: 2rem; }
+
+  /* ── Foto della città: mosaico invece di colonna.
+     Tre foto da 260px in fila erano 945px di altezza. Una grande sopra e due
+     affiancate sotto tengono la stessa gerarchia editoriale in metà spazio. */
+  .city-photos {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+    gap: 0.75rem 0.7rem;
+    margin-bottom: 2.5rem;
+  }
+  .city-photo:nth-child(1) { grid-column: 1 / -1; }
+
+  .city-photo:nth-child(1) .city-photo-inner { height: 230px; margin-top: 0; }
+  .city-photo-mid .city-photo-inner,
+  .city-photo:nth-child(3) .city-photo-inner { height: 168px; margin-top: 0; }
+
+  .city-photo-inner { border-radius: var(--radius); }
+
   /* Senza parallasse lo zoom 1.12 serve solo a tagliare la foto */
   .city-photo-inner img { transform: none; }
+
+  .city-photo-label {
+    margin-top: 0.55rem;
+    padding-left: 0.15rem;
+    gap: 0.5rem;
+  }
+  .city-photo-label > span:last-child {
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    line-height: 1.3;
+  }
+  .city-photo-num { font-size: 0.68rem; }
 
   .marquee-track img { width: 220px; height: 140px; }
   /* Meno pixel da spostare per fotogramma: scorrimento più fluido */
@@ -373,13 +434,9 @@
   /* ── Comfort: righe ancora più compatte */
   .feature-card { padding: 0.85rem 0.95rem; column-gap: 0.8rem; }
 
-  /* ── Gallery: una colonna, celle più alte */
-  .gallery-grid {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
-    gap: 3px;
-  }
-  .gallery-item { height: 230px; }
+  /* ── Galleria: foto un filo più basse, resta il carosello */
+  .gallery-item,
+  .gallery-item.gallery-item-large { height: 270px; }
 
   /* ── Location chips: 2 per riga */
   .location-chips { gap: 0.5rem; }
@@ -470,6 +527,12 @@
   .availability-title h3 { font-size: 1.15rem; }
 
   .marquee-track img { width: 180px; height: 115px; }
+
+  .gallery-item,
+  .gallery-item.gallery-item-large { height: 235px; flex-basis: 88%; }
+  .city-photo:nth-child(1) .city-photo-inner { height: 190px; }
+  .city-photo-mid .city-photo-inner,
+  .city-photo:nth-child(3) .city-photo-inner { height: 140px; }
 }
 
 /* ── TELEFONO IN ORIZZONTALE ────────────────────────── */

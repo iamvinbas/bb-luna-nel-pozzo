@@ -702,6 +702,45 @@ ul { list-style: none; }
 
 .gallery-item:hover .gallery-overlay { opacity: 1; }
 
+/* Indicatore del carosello — mostrato solo dove la galleria scorre (mobile.css) */
+.gallery-nav {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  margin-top: 1rem;
+}
+
+.gallery-dots {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.gallery-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(13,33,55,0.18);
+  transition: width 0.25s, background 0.25s;
+}
+
+/* La foto corrente è una pillola, non un punto: si distingue anche a colpo
+   d'occhio e senza affidarsi al solo colore. */
+.gallery-dot.is-active {
+  width: 20px;
+  border-radius: 3px;
+  background: var(--gold);
+}
+
+.gallery-count {
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--text-light);
+}
+
+.gallery-count span { color: var(--navy); font-weight: 600; }
+
 /* ── CITY — MOLFETTA ────────────────────────────────── */
 .city {
   padding: var(--section-y) 0 0;

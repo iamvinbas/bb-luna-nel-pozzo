@@ -264,7 +264,7 @@
           <h2 class="section-title">Esplora<br /><em>ogni angolo</em></h2>
         </div>
       </div>
-      <div class="gallery-grid">
+      <div class="gallery-grid" id="gallery-grid">
         <div class="gallery-item gallery-item-large reveal-up" data-index="0">
           <img src="images/gallery-1.jpg" alt="Camera da letto — La Luna nel Pozzo" loading="lazy" />
           <div class="gallery-overlay"><span>Camera da letto</span></div>
@@ -292,6 +292,17 @@
           <img src="images/gallery-6.jpg" alt="Quadro di muschio decorativo con lampada dorata" loading="lazy" />
           <div class="gallery-overlay"><span>Decorazioni</span></div>
         </div>
+      </div>
+
+      <!-- Indicatore del carosello: solo da telefono, dove la galleria
+           diventa scorrevole. Su schermi larghi resta la griglia e il CSS
+           lo nasconde. -->
+      <div class="gallery-nav" id="gallery-nav" hidden>
+        <div class="gallery-dots" id="gallery-dots" aria-hidden="true"></div>
+        <p class="gallery-count">
+          <span id="gallery-count-now">1</span> di
+          <span id="gallery-count-all">6</span> — scorri per vedere le altre
+        </p>
       </div>
     </section>
 

@@ -168,6 +168,61 @@ lightbox.addEventListener('touchend', e => {
   (dx < 0 ? nextLB : prevLB).click();
 }, { passive: true });
 
+/* ── GALLERIA: indicatore del carosello ─────────────── */
+/* Da telefono la galleria scorre di lato. Senza un segno di quante foto ci
+   sono, la seconda metà del servizio fotografico non la guarda nessuno. */
+(function initGalleryNav() {
+  const track = document.getElementById('gallery-grid');
+  const nav = document.getElementById('gallery-nav');
+  const dots = document.getElementById('gallery-dots');
+  const now = document.getElementById('gallery-count-now');
+  const all = document.getElementById('gallery-count-all');
+  if (!track || !nav || !dots) return;
+
+  const items = [...track.querySelectorAll('.gallery-item')];
+  if (items.length < 2) return;
+
+  all.textContent = items.length;
+  dots.innerHTML = items.map(() => '<span class="gallery-dot"></span>').join('');
+  const dotEls = [...dots.children];
+
+  let current = -1;
+  const setCurrent = (i) => {
+    if (i === current || i < 0) return;
+    current = i;
+    now.textContent = i + 1;
+    dotEls.forEach((d, k) => d.classList.toggle('is-active', k === i));
+  };
+
+  /* La foto "corrente" è quella che occupa il centro del riquadro. Si
+     ricava dalla posizione di scorrimento invece che da un osservatore:
+     con lo scatto attivo la misura è esatta e costa una divisione. */
+  let ticking = false;
+  const update = () => {
+    ticking = false;
+    const step = items[1].offsetLeft - items[0].offsetLeft;
+    if (step <= 0) return;
+    const i = Math.round(track.scrollLeft / step);
+    setCurrent(Math.min(Math.max(i, 0), items.length - 1));
+  };
+
+  track.addEventListener('scroll', () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(update);
+  }, { passive: true });
+
+  // L'indicatore serve solo dove il carosello esiste davvero: su schermi
+  // larghi la galleria resta una griglia e questa riga non ha senso.
+  const sync = () => {
+    nav.hidden = !isMobile();
+    if (!nav.hidden) update();
+  };
+  sync();
+  mqMobile.addEventListener('change', sync);
+  setCurrent(0);
+})();
+
 /* ── BOOKING FORM → WhatsApp ────────────────────────── */
 /* Il form ha `novalidate`: la validazione nativa è disattivata perché i suoi
    messaggi non sono traducibili né posizionabili. Quindi la facciamo tutta
