@@ -21,6 +21,7 @@
   const elMonths = document.getElementById('cal-months');
   const elStatus = document.getElementById('cal-status');
   const elUpdated = document.getElementById('cal-updated');
+  const elMinStay = document.getElementById('cal-min-stay');
   const elPrev = document.getElementById('cal-prev');
   const elNext = document.getElementById('cal-next');
   const inCheckin = document.getElementById('checkin');
@@ -117,6 +118,7 @@
       root.classList.remove('cal-unavailable');
       root.classList.remove('cal-loading');
 
+      paintMinStay();
       paintUpdated();
       applyInputBounds();
 
@@ -160,6 +162,13 @@
   }
 
   /* ── freschezza del dato ───────────────────────────── */
+
+  function paintMinStay() {
+    if (!elMinStay) return;
+    const value = elMinStay.querySelector('strong');
+    if (!value) return;
+    value.textContent = `${state.minNights} ${state.minNights === 1 ? 'notte' : 'notti'}`;
+  }
 
   /* L'etichetta diceva "aggiornato 2 ore fa" e restava congelata su quel
      testo per tutta la sessione. Ora si riscrive da sola. */
@@ -357,7 +366,13 @@
   /* ── selezione ─────────────────────────────────────── */
 
   function pick(ms) {
-    if (state.checkin === null || state.checkout !== null) {
+    // Un secondo click sull'arrivo annulla l'intera selezione e riporta il
+    // calendario allo stato iniziale, compresi i campi del modulo.
+    if (state.checkin !== null && ms === state.checkin) {
+      state.checkin = null;
+      state.checkout = null;
+      state.hover = null;
+    } else if (state.checkin === null || state.checkout !== null) {
       state.checkin = ms;
       state.checkout = null;
       state.hover = null;

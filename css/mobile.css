@@ -358,6 +358,8 @@
   .availability { padding: 1.4rem 1.1rem 1.2rem; margin-bottom: 2rem; }
   .availability-head { align-items: flex-start; gap: 0.9rem; }
   .availability-title h3 { font-size: 1.3rem; }
+  .availability-tools { width: 100%; justify-content: space-between; gap: 0.7rem; }
+  .cal-min-stay { font-size: 0.72rem; }
   .cal-legend { gap: 0.9rem; font-size: 0.72rem; }
   .cal { gap: 0.2rem; }
   .cal-months { gap: 0; }

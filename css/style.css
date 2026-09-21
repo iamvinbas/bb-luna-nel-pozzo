@@ -1196,6 +1196,33 @@ ul { list-style: none; }
   color: rgba(255,255,255,0.5);
 }
 
+.availability-tools {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.8rem 1.1rem;
+}
+
+.cal-min-stay {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid rgba(201,168,76,0.5);
+  border-radius: 999px;
+  background: rgba(201,168,76,0.1);
+  color: rgba(255,255,255,0.72);
+  font-size: 0.76rem;
+  white-space: nowrap;
+}
+
+.cal-min-stay strong {
+  color: var(--gold-light);
+  font-weight: 700;
+}
+
 .cal-legend {
   display: flex;
   flex-wrap: wrap;
