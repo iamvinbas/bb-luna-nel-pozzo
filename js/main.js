@@ -272,7 +272,17 @@ const EMAIL_RE = /^[^\s@]+@[^\s@.]+(\.[^\s@.]+)+$/;
 const DAY_MS = 86400000;
 const parseDay = (iso) => {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '');
-  return m ? Date.UTC(+m[1], +m[2] - 1, +m[3]) : NaN;
+  if (!m) return NaN;
+  const year = +m[1];
+  const month = +m[2] - 1;
+  const day = +m[3];
+  const ms = Date.UTC(year, month, day);
+  const date = new Date(ms);
+  return date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month &&
+    date.getUTCDate() === day
+    ? ms
+    : NaN;
 };
 const todayUTC = () => {
   const n = new Date();
@@ -387,6 +397,24 @@ function showFormError(msg) {
   formError.hidden = false;
 }
 
+function validateFormFields() {
+  const problems = FIELDS.map((id) => [id, validateField(id)]).filter(([, m]) => m);
+
+  if (!problems.length) return true;
+
+  problems.forEach(([id, message]) => setFieldError(id, message));
+  const [firstId] = problems[0];
+  showFormError(
+    problems.length === 1
+      ? 'Manca un dato: controlla il campo evidenziato.'
+      : `Mancano ${problems.length} dati: controlla i campi evidenziati.`,
+  );
+  const first = form.elements[firstId];
+  first.focus({ preventScroll: true });
+  first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  return false;
+}
+
 /* Correggere un campo deve togliere subito il suo errore: lasciarlo lì
    mentre si scrive fa credere che la correzione non sia stata registrata. */
 FIELDS.forEach((id) => {
@@ -418,36 +446,62 @@ window.addEventListener('luna:dates-rejected', (e) => {
   setFieldError('checkin', e.detail.problem + ' Guarda le celle in rosso sul calendario.');
 });
 
-form.addEventListener('submit', (e) => {
+form.addEventListener('submit', async (e) => {
   e.preventDefault();
   clearAllErrors();
 
-  const problems = FIELDS.map((id) => [id, validateField(id)]).filter(([, m]) => m);
+  if (!validateFormFields()) return;
 
-  if (problems.length) {
-    problems.forEach(([id, m]) => setFieldError(id, m));
-    const [firstId] = problems[0];
+  // Prima di aprire WhatsApp rileggiamo la disponibilità: così una prenotazione
+  // arrivata dopo il caricamento della pagina non passa con dati vecchi.
+  const availability = window.LunaAvailability;
+  if (!availability?.loaded) {
     showFormError(
-      problems.length === 1
-        ? 'Manca un dato: controlla il campo evidenziato.'
-        : `Mancano ${problems.length} dati: controlla i campi evidenziati.`,
+      'Non riesco ancora a verificare la disponibilità. Attendi il caricamento del calendario e riprova.',
     );
-    const first = form.elements[firstId];
-    first.focus({ preventScroll: true });
-    first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    availability?.scrollToCalendar();
     return;
   }
 
+  const submitButton = form.querySelector('button[type="submit"]');
+  const submitLabel = submitButton?.textContent;
+  if (submitButton) {
+    submitButton.disabled = true;
+    submitButton.textContent = 'Verifico disponibilità…';
+  }
+
+  let refreshed = false;
+  try {
+    refreshed = await availability.refresh();
+  } catch (err) {
+    refreshed = false;
+  } finally {
+    if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.textContent = submitLabel;
+    }
+  }
+
+  if (!refreshed || !availability.loaded) {
+    showFormError(
+      'Non riesco a verificare la disponibilità in questo momento. Attendi e riprova.',
+    );
+    availability.scrollToCalendar();
+    return;
+  }
+
+  // Il refresh può aver cancellato una selezione diventata occupata. Ripetiamo
+  // anche i controlli del modulo prima di leggere le date da inviare.
+  clearAllErrors();
+  if (!validateFormFields()) return;
+
   const checkin = form.elements.checkin.value;
   const checkout = form.elements.checkout.value;
-
-  // Ultimo controllo contro il calendario sincronizzato: evita che una
-  // richiesta parta per date già occupate su Airbnb o Booking.com.
-  const avail = window.LunaAvailability?.check(checkin, checkout);
-  if (avail && !avail.ok) {
-    setFieldError('checkin', avail.reason);
-    showFormError('Quelle date non sono libere — scegline altre sul calendario.');
-    window.LunaAvailability?.scrollToCalendar();
+  const avail = availability.check(checkin, checkout);
+  if (!avail.ok) {
+    setFieldError(avail.field ?? 'checkin', avail.reason);
+    showFormError(avail.reason);
+    availability.scrollToCalendar();
     return;
   }
 

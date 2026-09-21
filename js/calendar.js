@@ -33,7 +33,20 @@
   const WEEKDAYS = ['L','M','M','G','V','S','D'];
 
   const toISO = (ms) => new Date(ms).toISOString().slice(0, 10);
-  const fromISO = (s) => Date.UTC(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10));
+  const fromISO = (s) => {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || '');
+    if (!match) return NaN;
+    const year = +match[1];
+    const month = +match[2] - 1;
+    const day = +match[3];
+    const ms = Date.UTC(year, month, day);
+    const date = new Date(ms);
+    return date.getUTCFullYear() === year &&
+      date.getUTCMonth() === month &&
+      date.getUTCDate() === day
+      ? ms
+      : NaN;
+  };
   const fmtLong = (ms) => new Date(ms).toLocaleDateString('it-IT',
     { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 
@@ -108,12 +121,16 @@
       nights.clear();
       for (const d of fresh) nights.add(d);
 
-      state.minNights = data.minNights || 2;
+      const configuredMinNights = Number(data.minNights);
+      state.minNights = Number.isFinite(configuredMinNights)
+        ? Math.max(2, Math.floor(configuredMinNights))
+        : 2;
       state.checkinFrom = data.checkinFrom || state.checkinFrom;
       state.checkoutBy = data.checkoutBy || state.checkoutBy;
       state.sources = data.sources || null;
       state.updatedAt = data.updated ? new Date(data.updated) : null;
-      if (data.horizon?.to) state.horizonEnd = fromISO(data.horizon.to);
+      const horizonEnd = data.horizon?.to ? fromISO(data.horizon.to) : NaN;
+      if (!Number.isNaN(horizonEnd)) state.horizonEnd = horizonEnd;
       state.loaded = true;
       root.classList.remove('cal-unavailable');
       root.classList.remove('cal-loading');
@@ -139,17 +156,18 @@
           'Le date che avevi scelto sono state appena prenotate altrove. ' +
           'Scegline altre sul calendario.';
         elStatus.classList.add('is-warn');
-        return;
+        return true;
       }
 
       render();
       if (silent && changed) flashUpdated();
+      return true;
     } catch (err) {
       // Un aggiornamento in background che fallisce non deve cancellare un
       // calendario già a schermo: si tiene il dato vecchio e si dice che è vecchio.
       if (state.loaded) {
         paintUpdated();
-        return;
+        return false;
       }
       root.classList.remove('cal-loading');
       root.classList.add('cal-unavailable');
@@ -158,6 +176,7 @@
         '<a href="https://wa.me/393299866890" target="_blank" rel="noopener">Scrivici su WhatsApp</a> ' +
         'e ti confermiamo le date in pochi minuti.';
       elStatus.classList.add('is-warn');
+      return false;
     }
   }
 
@@ -499,18 +518,45 @@
     get loaded() { return state.loaded; },
     refresh: () => load({ silent: true }),
 
-    /** @returns {{ok:boolean, reason?:string}} */
+    /** @returns {{ok:boolean, code?:string, field?:string, reason?:string}} */
     check(checkinISO, checkoutISO) {
-      if (!state.loaded) return { ok: true }; // dati assenti: non blocchiamo la richiesta
+      if (!state.loaded) {
+        return {
+          ok: false,
+          code: 'not-ready',
+          reason: 'Il calendario non è ancora pronto: attendi qualche secondo e riprova.',
+        };
+      }
       const a = fromISO(checkinISO);
       const b = fromISO(checkoutISO);
+      if (Number.isNaN(a) || Number.isNaN(b)) {
+        return { ok: false, code: 'invalid-date', reason: 'Controlla le date selezionate.' };
+      }
       if (a < TODAY) return { ok: false, reason: 'La data di arrivo è nel passato.' };
+      if (a >= state.horizonEnd) {
+        return { ok: false, field: 'checkin', reason: 'La data di arrivo è oltre il periodo prenotabile.' };
+      }
+      if (b > state.horizonEnd) {
+        return { ok: false, field: 'checkout', reason: 'La data di partenza è oltre il periodo prenotabile.' };
+      }
+      if (b <= a) {
+        return { ok: false, field: 'checkout', reason: 'La partenza deve venire dopo l’arrivo.' };
+      }
       if ((b - a) / DAY < state.minNights) {
-        return { ok: false, reason: `Il soggiorno minimo è di ${state.minNights} notti.` };
+        return {
+          ok: false,
+          field: 'checkout',
+          reason: `Il soggiorno minimo è di ${state.minNights} notti.`,
+        };
       }
       for (let t = a; t < b; t += DAY) {
         if (isBooked(t)) {
-          return { ok: false, reason: `${fmtLong(t)} non è disponibile. Scegli altre date sul calendario.` };
+          return {
+            ok: false,
+            code: 'booked',
+            field: t === a ? 'checkin' : 'checkout',
+            reason: `${fmtLong(t)} non è disponibile. Scegli altre date sul calendario.`,
+          };
         }
       }
       return { ok: true };
@@ -549,13 +595,13 @@
     const a = inCheckin?.value ? fromISO(inCheckin.value) : null;
     const b = inCheckout?.value ? fromISO(inCheckout.value) : null;
 
-    if (a === null) return null;
+    if (a === null || Number.isNaN(a)) return null;
 
     if (isBooked(a)) state.rejected.add(toISO(a));
 
     // Con entrambe le date si controlla tutto l'intervallo: il problema può
     // stare nel mezzo, non per forza sul giorno di arrivo.
-    if (b !== null && b > a) {
+    if (b !== null && !Number.isNaN(b) && b > a) {
       for (let t = a; t < b; t += DAY) if (isBooked(t)) state.rejected.add(toISO(t));
     }
 
