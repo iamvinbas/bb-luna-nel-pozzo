@@ -403,13 +403,13 @@
   .banner-text { align-items: center; }
 
   /* ── Footer */
-  .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
-  .footer-brand,
+  .footer-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.5rem 1.25rem; }
+  .footer-brand { grid-column: 1 / -1; text-align: center; }
   .footer-links,
-  .footer-contact { text-align: center; }
+  .footer-contact { text-align: left; }
   .footer-brand-name { justify-content: center; }
   .footer-links ul,
-  .footer-contact ul { align-items: center; }
+  .footer-contact ul { align-items: flex-start; }
   .footer { padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px)); }
 }
 
