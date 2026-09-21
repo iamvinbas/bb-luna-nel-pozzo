@@ -403,8 +403,11 @@
   .banner-text { align-items: center; }
 
   /* ── Footer */
-  .footer-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.5rem 1.25rem; }
-  .footer-brand { grid-column: 1 / -1; text-align: center; }
+  .footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 1.5rem 1.25rem;
+  }
+  .footer-grid > .footer-brand { grid-column: 1 / -1; text-align: center; }
   .footer-links,
   .footer-contact { text-align: left; }
   .footer-brand-name { justify-content: center; }
