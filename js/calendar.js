@@ -170,14 +170,12 @@
     value.textContent = `${state.minNights} ${state.minNights === 1 ? 'notte' : 'notti'}`;
   }
 
-  /* L'etichetta diceva "aggiornato 2 ore fa" e restava congelata su quel
-     testo per tutta la sessione. Ora si riscrive da sola. */
+  /* La freschezza resta disponibile nei dati e nei log; al cliente mostriamo
+     una dicitura neutra, senza esporre l'età dell'ultimo aggiornamento. */
   function paintUpdated() {
-    if (!elUpdated || !state.updatedAt) return;
-    const mins = (Date.now() - state.updatedAt.getTime()) / 60000;
-    elUpdated.textContent = `aggiornato ${relTime(state.updatedAt)}`;
-    // Oltre le 6 ore il dato non è più una garanzia: meglio dirlo.
-    elUpdated.classList.toggle('is-stale', mins > 360);
+    if (!elUpdated) return;
+    elUpdated.textContent = 'Disponibilità sincronizzata automaticamente';
+    elUpdated.classList.remove('is-stale');
   }
 
   function flashUpdated() {
@@ -625,9 +623,6 @@
 
   // 2. ricontrollo periodico mentre la pagina è in primo piano
   setInterval(() => maybeRefresh(REFRESH_MS), 60000);
-
-  // 3. l'etichetta "aggiornato N ore fa" si riscrive da sola ogni minuto
-  setInterval(paintUpdated, 60000);
 
   // Finché i dati non arrivano il calendario è inerte: mostrare giorni
   // "liberi" prima di conoscere le prenotazioni sarebbe peggio di non mostrarli.
