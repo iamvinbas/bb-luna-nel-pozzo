@@ -1,12 +1,12 @@
 {
-  "updated": "2026-10-02T23:14:32.821Z",
+  "updated": "2026-10-03T01:57:35.817Z",
   "timezone": "Europe/Rome",
   "minNights": 2,
   "checkinFrom": "15:00",
   "checkoutBy": "11:00",
   "horizon": {
-    "from": "2026-10-02",
-    "to": "2027-10-02"
+    "from": "2026-10-03",
+    "to": "2027-10-03"
   },
   "ranges": [
     {
@@ -15,14 +15,14 @@
     },
     {
       "from": "2027-01-01",
-      "to": "2027-10-02"
+      "to": "2027-10-03"
     }
   ],
   "sources": {
     "airbnb": {
       "label": "Airbnb",
       "ok": true,
-      "events": 3
+      "events": 2
     },
     "booking": {
       "label": "Booking.com",
