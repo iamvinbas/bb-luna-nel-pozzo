@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="it">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta
@@ -9,16 +9,16 @@
     <meta name="theme-color" content="#0D2137" />
     <meta
       name="description"
-      content="La Luna nel Pozzo — appartamento esclusivo a Molfetta, Bari. Prenota direttamente e risparmia. Vivi l'autenticità della Puglia."
+      content="La Luna nel Pozzo — a charming holiday apartment in Molfetta, near Bari. Book direct and save. Experience the authentic Puglia."
     />
     <meta
       name="keywords"
-      content="b&b molfetta, appartamento molfetta, puglia, airbnb molfetta, affitto molfetta bari"
+      content="molfetta apartment, holiday rental molfetta, puglia apartment, bari holiday apartment, b&b molfetta"
     />
     <meta property="og:title" content="La Luna nel Pozzo — Molfetta, Bari" />
     <meta
       property="og:description"
-      content="Appartamento esclusivo nel cuore di Molfetta. Prenota direttamente e risparmia sulle commissioni."
+      content="A charming apartment in the heart of Molfetta. Book direct and save on booking fees."
     />
     <meta property="og:type" content="website" />
     <meta
@@ -27,45 +27,25 @@
     />
     <meta
       property="og:url"
-      content="https://iamvinbas.github.io/bb-luna-nel-pozzo/"
+      content="https://iamvinbas.github.io/bb-luna-nel-pozzo/en/"
     />
+    <meta property="og:locale" content="en_GB" />
+    <meta property="og:locale:alternate" content="it_IT" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="La Luna nel Pozzo — Molfetta, Bari" />
     <meta
       name="twitter:description"
-      content="Appartamento esclusivo nel cuore di Molfetta. Prenota direttamente e risparmia sulle commissioni."
+      content="A charming apartment in the heart of Molfetta. Book direct and save on booking fees."
     />
     <meta
       name="twitter:image"
       content="https://iamvinbas.github.io/bb-luna-nel-pozzo/images/hero.jpg"
     />
-    <meta property="og:locale" content="it_IT" />
-    <meta property="og:locale:alternate" content="en_GB" />
-    <title>La Luna nel Pozzo — Molfetta, Bari</title>
-    <link rel="canonical" href="https://iamvinbas.github.io/bb-luna-nel-pozzo/" />
+    <title>La Luna nel Pozzo — Apartment in Molfetta, Bari</title>
+    <link rel="canonical" href="https://iamvinbas.github.io/bb-luna-nel-pozzo/en/" />
     <link rel="alternate" hreflang="it" href="https://iamvinbas.github.io/bb-luna-nel-pozzo/" />
     <link rel="alternate" hreflang="en" href="https://iamvinbas.github.io/bb-luna-nel-pozzo/en/" />
     <link rel="alternate" hreflang="x-default" href="https://iamvinbas.github.io/bb-luna-nel-pozzo/" />
-    <script>
-      /* Prima visita da un browser che non parla italiano → versione inglese.
-         Questa pagina resta la principale e quella che Google indicizza: i
-         crawler non vengono mai spostati, e chi ha già scelto una lingua dal
-         selettore (o arriva proprio da /en/) resta dove ha deciso di stare. */
-      (function () {
-        if (/bot|crawl|spider|slurp|preview|lighthouse|headless/i.test(navigator.userAgent)) return;
-        var go = function () { location.replace('en/' + location.search + location.hash); };
-        var saved = null;
-        try { saved = localStorage.getItem('luna-lang'); } catch (e) {}
-        if (saved) { if (saved === 'en') go(); return; }
-        if (/\/en\//.test(document.referrer) && document.referrer.indexOf(location.host) !== -1) return;
-        var langs = navigator.languages && navigator.languages.length
-          ? navigator.languages
-          : [navigator.language || ''];
-        if (!langs[0]) return;
-        for (var i = 0; i < langs.length; i++) if (/^it\b/i.test(langs[i])) return;
-        go();
-      })();
-    </script>
     <link
       rel="icon"
       href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌙</text></svg>"
@@ -80,8 +60,8 @@
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     />
-    <link rel="stylesheet" href="css/style.css?v=lang-1" />
-    <link rel="stylesheet" href="css/mobile.css?v=lang-1" />
+    <link rel="stylesheet" href="../css/style.css?v=lang-1" />
+    <link rel="stylesheet" href="../css/mobile.css?v=lang-1" />
   </head>
   <body>
     <!-- ═══════════════════════════ NAVIGATION ═══════════════════════════ -->
@@ -100,15 +80,15 @@
           <span class="logo-text">La Luna nel Pozzo</span>
         </a>
         <ul class="nav-links" id="nav-links">
-          <li><a href="#about">L'Appartamento</a></li>
-          <li><a href="#features">Comfort</a></li>
-          <li><a href="#gallery">Galleria</a></li>
-          <li><a href="#location">Posizione</a></li>
-          <li><a href="#booking" class="nav-cta">Prenota</a></li>
+          <li><a href="#about">The Apartment</a></li>
+          <li><a href="#features">Amenities</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+          <li><a href="#location">Location</a></li>
+          <li><a href="#booking" class="nav-cta">Book</a></li>
         </ul>
-        <div class="lang-switch" aria-label="Lingua">
-          <span class="lang-current" lang="it" aria-current="true">IT</span>
-          <a href="en/" hreflang="en" lang="en" data-lang-switch title="English">EN</a>
+        <div class="lang-switch" aria-label="Language">
+          <a href="../" hreflang="it" lang="it" data-lang-switch title="Italiano">IT</a>
+          <span class="lang-current" lang="en" aria-current="true">EN</span>
         </div>
         <button
           class="hamburger"
@@ -126,7 +106,7 @@
     <!-- ═══════════════════════════ HERO ═══════════════════════════════════ -->
     <section class="hero" id="hero">
       <div class="hero-bg">
-        <img src="images/hero.jpg" alt="Camera da letto — La Luna nel Pozzo" />
+        <img src="../images/hero.jpg" alt="Bedroom — La Luna nel Pozzo" />
       </div>
       <div class="hero-overlay"></div>
       <div class="hero-content">
@@ -146,19 +126,19 @@
           La Luna<br /><em>nel Pozzo</em>
         </h1>
         <p class="hero-subtitle reveal-up delay-2">
-          Un rifugio autentico nel cuore della Puglia
+          An authentic retreat in the heart of Puglia
         </p>
         <div class="hero-badges reveal-up delay-3">
-          <span class="badge">👥 Fino a 4 ospiti</span>
-          <span class="badge">🛏 2 Letti</span>
+          <span class="badge">👥 Up to 4 guests</span>
+          <span class="badge">🛏 2 Beds</span>
           <span class="badge">⭐ 5.0</span>
         </div>
         <div class="hero-cta reveal-up delay-4">
-          <a href="#booking" class="btn btn-primary">Prenota Direttamente</a>
-          <a href="#about" class="btn btn-ghost">Scopri di più</a>
+          <a href="#booking" class="btn btn-primary">Book Direct</a>
+          <a href="#about" class="btn btn-ghost">Discover more</a>
         </div>
       </div>
-      <a href="#about" class="hero-scroll-hint" aria-label="Scorri">
+      <a href="#about" class="hero-scroll-hint" aria-label="Scroll down">
         <span class="scroll-arrow"></span>
       </a>
     </section>
@@ -169,13 +149,13 @@
         <div class="banner-inner">
           <div class="banner-icon">💰</div>
           <div class="banner-text">
-            <strong>Prenota direttamente e risparmia</strong>
+            <strong>Book direct and save</strong>
             <span
-              >Nessuna commissione Airbnb o Booking — stessa qualità, prezzo
-              migliore</span
+              >No Airbnb or Booking.com fees — same quality, better
+              price</span
             >
           </div>
-          <a href="#booking" class="btn btn-primary btn-sm">Contattaci ora</a>
+          <a href="#booking" class="btn btn-primary btn-sm">Contact us now</a>
         </div>
       </div>
     </section>
@@ -186,41 +166,41 @@
         <div class="about-grid">
           <div class="about-images reveal-left">
             <div class="about-img-main">
-              <img src="images/about-main.jpg" alt="Cucina e soggiorno — La Luna nel Pozzo" loading="lazy" />
+              <img src="../images/about-main.jpg" alt="Kitchen and living room — La Luna nel Pozzo" loading="lazy" />
             </div>
             <div class="about-img-secondary">
-              <img src="images/about-detail-1.jpg" alt="Camera da letto con luce naturale" loading="lazy" />
-              <img src="images/about-detail-2.jpg" alt="Dettagli bagno con saponi e asciugamani" loading="lazy" />
+              <img src="../images/about-detail-1.jpg" alt="Bedroom with natural light" loading="lazy" />
+              <img src="../images/about-detail-2.jpg" alt="Bathroom details with soaps and towels" loading="lazy" />
             </div>
           </div>
           <div class="about-text reveal-right">
-            <span class="section-label">L'Appartamento</span>
+            <span class="section-label">The Apartment</span>
             <h2 class="section-title">
-              Un luogo dove il tempo<br /><em>si ferma</em>
+              A place where time<br /><em>stands still</em>
             </h2>
             <p>
-              Benvenuti a <strong>La Luna nel Pozzo</strong>, un appartamento
-              dal fascino unico nel cuore storico di Molfetta. Tra le mura
-              antiche e l'odore del mare adriatico, vi aspetta un'esperienza
-              autentica della vita pugliese.
+              Welcome to <strong>La Luna nel Pozzo</strong>, an apartment of
+              unique charm in the historic heart of Molfetta. Among ancient
+              walls and the scent of the Adriatic Sea, an authentic taste of
+              Apulian life awaits you.
             </p>
             <p>
-              L'appartamento è stato curato nei minimi dettagli per offrirvi
-              tutto il comfort moderno senza rinunciare all'atmosfera calda e
-              accogliente di una casa vera.
+              Every detail of the apartment has been cared for to give you all
+              the modern comforts, without losing the warm and welcoming
+              atmosphere of a real home.
             </p>
             <div class="about-stats">
               <div class="stat">
                 <span class="stat-num">4</span>
-                <span class="stat-label">Ospiti max</span>
+                <span class="stat-label">Guests max</span>
               </div>
               <div class="stat">
                 <span class="stat-num">2</span>
-                <span class="stat-label">Letti</span>
+                <span class="stat-label">Beds</span>
               </div>
               <div class="stat">
                 <span class="stat-num">1</span>
-                <span class="stat-label">Bagno</span>
+                <span class="stat-label">Bathroom</span>
               </div>
               <div class="stat">
                 <span class="stat-num">40</span>
@@ -236,51 +216,51 @@
     <section class="features" id="features">
       <div class="container">
         <div class="section-header reveal-up">
-          <span class="section-label">Comfort inclusi</span>
+          <span class="section-label">Amenities included</span>
           <h2 class="section-title">
-            Tutto quello<br /><em>di cui hai bisogno</em>
+            Everything<br /><em>you need</em>
           </h2>
         </div>
         <div class="features-grid">
           <div class="feature-card reveal-up">
             <div class="feature-icon">📶</div>
-            <h3>WiFi veloce</h3>
-            <p>Connessione fibra ad alta velocità in tutto l'appartamento</p>
+            <h3>Fast WiFi</h3>
+            <p>High-speed fibre connection throughout the apartment</p>
           </div>
           <div class="feature-card reveal-up delay-1">
             <div class="feature-icon">❄️</div>
-            <h3>Aria condizionata</h3>
-            <p>Climatizzatore in ogni ambiente per massimo comfort</p>
+            <h3>Air conditioning</h3>
+            <p>Air conditioning in every room for maximum comfort</p>
           </div>
           <div class="feature-card reveal-up delay-2">
             <div class="feature-icon">🍳</div>
-            <h3>Cucina attrezzata</h3>
-            <p>Cucina completa con tutti gli elettrodomestici</p>
+            <h3>Equipped kitchen</h3>
+            <p>Fully equipped kitchen with all appliances</p>
           </div>
           <div class="feature-card reveal-up delay-3">
             <div class="feature-icon">🧺</div>
-            <h3>Lavatrice</h3>
-            <p>Lavatrice disponibile per soggiorni più lunghi</p>
+            <h3>Washing machine</h3>
+            <p>Washing machine available for longer stays</p>
           </div>
           <div class="feature-card reveal-up">
             <div class="feature-icon">🌊</div>
-            <h3>Vicino al mare</h3>
-            <p>A pochi minuti a piedi dal porto e dal lungomare</p>
+            <h3>Close to the sea</h3>
+            <p>A few minutes' walk from the harbour and the seafront</p>
           </div>
           <div class="feature-card reveal-up delay-1">
             <div class="feature-icon">🚗</div>
-            <h3>Parcheggio</h3>
-            <p>Possibilità di parcheggio nelle vicinanze</p>
+            <h3>Parking</h3>
+            <p>Parking available nearby</p>
           </div>
           <div class="feature-card reveal-up delay-2">
             <div class="feature-icon">☕</div>
-            <h3>Kit benvenuto</h3>
-            <p>Caffè, tè e prodotti tipici pugliesi all'arrivo</p>
+            <h3>Welcome kit</h3>
+            <p>Coffee, tea and local Apulian products on arrival</p>
           </div>
           <div class="feature-card reveal-up delay-3">
             <div class="feature-icon">🏠</div>
-            <h3>Check-in flessibile</h3>
-            <p>Orari di check-in personalizzabili su richiesta</p>
+            <h3>Flexible check-in</h3>
+            <p>Check-in times can be arranged on request</p>
           </div>
         </div>
       </div>
@@ -290,48 +270,47 @@
     <section class="gallery" id="gallery">
       <div class="container">
         <div class="section-header reveal-up">
-          <span class="section-label">Galleria</span>
-          <h2 class="section-title">Esplora<br /><em>ogni angolo</em></h2>
+          <span class="section-label">Gallery</span>
+          <h2 class="section-title">Explore<br /><em>every corner</em></h2>
         </div>
       </div>
       <div class="gallery-grid" id="gallery-grid">
         <div class="gallery-item gallery-item-large reveal-up" data-index="0">
-          <img src="images/gallery-1.jpg" alt="Camera da letto — La Luna nel Pozzo" loading="lazy" />
-          <div class="gallery-overlay"><span>Camera da letto</span></div>
+          <img src="../images/gallery-1.jpg" alt="Bedroom — La Luna nel Pozzo" loading="lazy" />
+          <div class="gallery-overlay"><span>Bedroom</span></div>
         </div>
         <div class="gallery-item reveal-up delay-1" data-index="1">
-          <img src="images/gallery-2.jpg" alt="Cucina con balcone" loading="lazy" />
-          <div class="gallery-overlay"><span>Cucina</span></div>
+          <img src="../images/gallery-2.jpg" alt="Kitchen with balcony" loading="lazy" />
+          <div class="gallery-overlay"><span>Kitchen</span></div>
         </div>
         <div class="gallery-item reveal-up delay-2" data-index="2">
-          <img src="images/gallery-3.jpg" alt="Soggiorno con soffitto a volta e balcone" loading="lazy" />
-          <div class="gallery-overlay"><span>Soggiorno</span></div>
+          <img src="../images/gallery-3.jpg" alt="Living room with vaulted ceiling and balcony" loading="lazy" />
+          <div class="gallery-overlay"><span>Living room</span></div>
         </div>
         <div class="gallery-item reveal-up delay-1" data-index="3">
-          <img src="images/gallery-4.jpg" alt="Bagno con specchio e lavabo" loading="lazy" />
-          <div class="gallery-overlay"><span>Bagno</span></div>
+          <img src="../images/gallery-4.jpg" alt="Bathroom with mirror and washbasin" loading="lazy" />
+          <div class="gallery-overlay"><span>Bathroom</span></div>
         </div>
         <div
           class="gallery-item gallery-item-large reveal-up delay-2"
           data-index="4"
         >
-          <img src="images/gallery-5.jpg" alt="Letto con quadro di muschio e luci calde" loading="lazy" />
-          <div class="gallery-overlay"><span>Atmosfera</span></div>
+          <img src="../images/gallery-5.jpg" alt="Bed with moss artwork and warm lights" loading="lazy" />
+          <div class="gallery-overlay"><span>Atmosphere</span></div>
         </div>
         <div class="gallery-item reveal-up delay-3" data-index="5">
-          <img src="images/gallery-6.jpg" alt="Quadro di muschio decorativo con lampada dorata" loading="lazy" />
-          <div class="gallery-overlay"><span>Decorazioni</span></div>
+          <img src="../images/gallery-6.jpg" alt="Decorative moss artwork with golden lamp" loading="lazy" />
+          <div class="gallery-overlay"><span>Details</span></div>
         </div>
       </div>
 
-      <!-- Indicatore del carosello: solo da telefono, dove la galleria
-           diventa scorrevole. Su schermi larghi resta la griglia e il CSS
-           lo nasconde. -->
+      <!-- Carousel indicator: phone only, where the gallery scrolls
+           sideways. On wide screens the grid stays and CSS hides it. -->
       <div class="gallery-nav" id="gallery-nav" hidden>
         <div class="gallery-dots" id="gallery-dots" aria-hidden="true"></div>
         <p class="gallery-count">
-          <span id="gallery-count-now">1</span> di
-          <span id="gallery-count-all">6</span> — scorri per vedere le altre
+          <span id="gallery-count-now">1</span> of
+          <span id="gallery-count-all">6</span> — swipe to see more
         </p>
       </div>
     </section>
@@ -341,10 +320,10 @@
       <div class="container">
         <div class="city-header reveal-up">
           <span class="section-label">Molfetta, Puglia</span>
-          <h2 class="section-title">La città<br /><em>ti aspetta</em></h2>
+          <h2 class="section-title">The town<br /><em>awaits you</em></h2>
           <p class="section-desc">
-            Porto antico, mare cristallino, centro storico medievale. Molfetta è
-            molto più di una destinazione — è un'emozione.
+            An ancient harbour, crystal-clear sea, a medieval old town.
+            Molfetta is much more than a destination — it is an emotion.
           </p>
         </div>
 
@@ -353,15 +332,15 @@
           <div class="city-photo reveal-up" data-parallax="-0.18">
             <div class="city-photo-inner">
               <img
-                src="images/city-puglia-aerial.jpg"
-                alt="Vista aerea della Puglia bianca"
+                src="../images/city-puglia-aerial.jpg"
+                alt="Aerial view of white Puglia"
                 loading="lazy"
                 onerror="this.parentElement.classList.add('img-fallback')"
               />
             </div>
             <div class="city-photo-label">
               <span class="city-photo-num">01</span>
-              <span>La Puglia dall'alto</span>
+              <span>Puglia from above</span>
             </div>
           </div>
           <div
@@ -370,29 +349,29 @@
           >
             <div class="city-photo-inner">
               <img
-                src="images/city-adriatic.jpg"
-                alt="Vista aerea del mare adriatico Puglia"
+                src="../images/city-adriatic.jpg"
+                alt="Aerial view of the Adriatic Sea, Puglia"
                 loading="lazy"
                 onerror="this.parentElement.classList.add('img-fallback')"
               />
             </div>
             <div class="city-photo-label">
               <span class="city-photo-num">02</span>
-              <span>L'Adriatico</span>
+              <span>The Adriatic</span>
             </div>
           </div>
           <div class="city-photo reveal-up delay-2" data-parallax="-0.1">
             <div class="city-photo-inner">
               <img
-                src="images/city-port-arch.jpg"
-                alt="Arco antico sul porto pugliese"
+                src="../images/city-port-arch.jpg"
+                alt="Ancient arch on an Apulian harbour"
                 loading="lazy"
                 onerror="this.parentElement.classList.add('img-fallback')"
               />
             </div>
             <div class="city-photo-label">
               <span class="city-photo-num">03</span>
-              <span>Il Porto Antico</span>
+              <span>The Old Harbour</span>
             </div>
           </div>
         </div>
@@ -402,101 +381,81 @@
       <div class="city-marquee" aria-hidden="true">
         <div class="marquee-track">
           <img
-            src="images/molfetta-boats.jpg"
-            alt="Barche colorate al porto di Molfetta"
+            src="../images/molfetta-boats.jpg"
+            alt="Colourful boats in Molfetta harbour"
             loading="lazy"
           />
           <img
-            src="images/molfetta-lighthouse.jpg"
-            alt="Faro di Molfetta"
+            src="../images/molfetta-lighthouse.jpg"
+            alt="Molfetta lighthouse"
             loading="lazy"
           />
           <img
-            src="images/molfetta-port.jpg"
-            alt="Porto e faro di Molfetta"
+            src="../images/molfetta-port.jpg"
+            alt="Molfetta harbour and lighthouse"
             loading="lazy"
           />
           <img
-            src="images/molfetta-kayak.jpg"
-            alt="Kayak vicino al faro di Molfetta"
+            src="../images/molfetta-kayak.jpg"
+            alt="Kayak near the Molfetta lighthouse"
             loading="lazy"
           />
           <img
-            src="images/puglia-sea-rocks.jpg"
-            alt="Rocce e mare cristallino in Puglia"
+            src="../images/puglia-sea-rocks.jpg"
+            alt="Rocks and crystal-clear sea in Puglia"
             loading="lazy"
           />
           <img
-            src="images/puglia-vieste.jpg"
-            alt="Vieste, Puglia — città sul mare"
+            src="../images/puglia-vieste.jpg"
+            alt="Vieste, Puglia — a town by the sea"
             loading="lazy"
           />
           <img
-            src="images/puglia-old-town.jpg"
-            alt="Centro storico pugliese sul mare"
+            src="../images/puglia-old-town.jpg"
+            alt="Apulian old town by the sea"
             loading="lazy"
           />
           <!-- duplicate for seamless loop -->
-          <img src="images/molfetta-boats.jpg" alt="" loading="lazy" />
-          <img src="images/molfetta-lighthouse.jpg" alt="" loading="lazy" />
-          <img src="images/molfetta-port.jpg" alt="" loading="lazy" />
-          <img src="images/molfetta-kayak.jpg" alt="" loading="lazy" />
-          <img src="images/puglia-sea-rocks.jpg" alt="" loading="lazy" />
-          <img src="images/puglia-vieste.jpg" alt="" loading="lazy" />
-          <img src="images/puglia-old-town.jpg" alt="" loading="lazy" />
+          <img src="../images/molfetta-boats.jpg" alt="" loading="lazy" />
+          <img src="../images/molfetta-lighthouse.jpg" alt="" loading="lazy" />
+          <img src="../images/molfetta-port.jpg" alt="" loading="lazy" />
+          <img src="../images/molfetta-kayak.jpg" alt="" loading="lazy" />
+          <img src="../images/puglia-sea-rocks.jpg" alt="" loading="lazy" />
+          <img src="../images/puglia-vieste.jpg" alt="" loading="lazy" />
+          <img src="../images/puglia-old-town.jpg" alt="" loading="lazy" />
         </div>
       </div>
     </section>
-
-    <!-- ═══════════════════════════ VIRTUAL TOUR (placeholder) ═══════════ -->
-    <!-- COMMENTATO — da riabilitare quando il tour 360° sarà pronto
-    <section class="virtual-tour" id="virtual-tour">
-      <div class="container">
-        <div class="tour-inner reveal-up">
-          <div class="tour-badge">Prossimamente</div>
-          <h2 class="section-title">Tour Virtuale<br /><em>360°</em></h2>
-          <p>
-            Presto potrai esplorare ogni stanza comodamente da casa tua.<br />Un'esperienza
-            immersiva per vivere l'appartamento prima ancora di arrivare.
-          </p>
-          <div class="tour-preview">
-            <div class="tour-icon">🌐</div>
-            <span>Tour interattivo 360° — disponibile presto</span>
-          </div>
-        </div>
-      </div>
-    </section>
-    -->
 
     <!-- ═══════════════════════════ LOCATION ════════════════════════════ -->
     <section class="location" id="location">
       <div class="container">
         <div class="location-header reveal-up">
-          <span class="section-label">Dove siamo</span>
-          <h2 class="section-title">Molfetta,<br /><em>Cuore di Puglia</em></h2>
+          <span class="section-label">Where we are</span>
+          <h2 class="section-title">Molfetta,<br /><em>Heart of Puglia</em></h2>
         </div>
         <div class="location-chips reveal-up delay-1">
           <div class="loc-chip">
             <span class="chip-icon">🏖</span>
             <div>
-              <strong>Porto e spiagge</strong><span>5 min a piedi</span>
+              <strong>Harbour and beaches</strong><span>5 min walk</span>
             </div>
           </div>
           <div class="loc-chip">
             <span class="chip-icon">🍽</span>
-            <div><strong>Ristoranti</strong><span>2 min a piedi</span></div>
+            <div><strong>Restaurants</strong><span>2 min walk</span></div>
           </div>
           <div class="loc-chip">
             <span class="chip-icon">🚂</span>
-            <div><strong>Stazione</strong><span>10 min a piedi</span></div>
+            <div><strong>Train station</strong><span>10 min walk</span></div>
           </div>
           <div class="loc-chip">
             <span class="chip-icon">✈️</span>
-            <div><strong>Aeroporto BRI</strong><span>25 min in auto</span></div>
+            <div><strong>Bari Airport (BRI)</strong><span>25 min by car</span></div>
           </div>
           <div class="loc-chip">
             <span class="chip-icon">🌙</span>
-            <div><strong>Centro storico</strong><span>3 min a piedi</span></div>
+            <div><strong>Old town</strong><span>3 min walk</span></div>
           </div>
         </div>
       </div>
@@ -525,7 +484,7 @@
             rel="noopener"
             class="map-card-link"
           >
-            Apri mappa →
+            Open map →
           </a>
         </div>
       </div>
@@ -535,13 +494,13 @@
     <section class="booking" id="booking">
       <div class="container">
         <div class="section-header reveal-up">
-          <span class="section-label">Prenota direttamente</span>
+          <span class="section-label">Book direct</span>
           <h2 class="section-title">
-            Contattaci<br /><em>senza intermediari</em>
+            Contact us<br /><em>with no middlemen</em>
           </h2>
           <p class="section-desc">
-            Scrivi direttamente a noi — risponderemo entro poche ore per
-            confermare disponibilità e prezzo.
+            Write to us directly — we will reply within a few hours to
+            confirm availability and price.
           </p>
         </div>
 
@@ -549,20 +508,20 @@
         <div class="availability reveal-up" id="availability">
           <div class="availability-head">
             <div class="availability-title">
-              <h3>Disponibilità</h3>
+              <h3>Availability</h3>
               <p class="availability-sub">
-                <span id="cal-sources">Sincronizzata con Airbnb e Booking.com</span>
-                — <span id="cal-updated">Disponibilità sincronizzata automaticamente</span>
+                <span id="cal-sources">Synced with Airbnb and Booking.com</span>
+                — <span id="cal-updated">Availability synced automatically</span>
               </p>
             </div>
             <div class="availability-tools">
               <p class="cal-min-stay" id="cal-min-stay" role="note">
-                <span>Soggiorno minimo</span>
-                <strong>2 notti</strong>
+                <span>Minimum stay</span>
+                <strong>2 nights</strong>
               </p>
               <ul class="cal-legend">
-                <li><i class="cal-dot cal-dot-free"></i>Libero</li>
-                <li><i class="cal-dot cal-dot-booked"></i>Non disponibile</li>
+                <li><i class="cal-dot cal-dot-free"></i>Available</li>
+                <li><i class="cal-dot cal-dot-booked"></i>Not available</li>
               </ul>
             </div>
           </div>
@@ -572,7 +531,7 @@
               type="button"
               class="cal-nav cal-nav-prev"
               id="cal-prev"
-              aria-label="Mese precedente"
+              aria-label="Previous month"
             >
               ‹
             </button>
@@ -581,20 +540,20 @@
               type="button"
               class="cal-nav cal-nav-next"
               id="cal-next"
-              aria-label="Mese successivo"
+              aria-label="Next month"
             >
               ›
             </button>
           </div>
 
           <p class="cal-status" id="cal-status" role="status" aria-live="polite">
-            Tocca il giorno di arrivo, poi quello di partenza.
+            Tap your arrival day, then your departure day.
           </p>
 
           <ul class="cal-hours">
-            <li>Check-in <strong>dalle 15:00</strong></li>
-            <li>Check-out <strong>entro le 11:00</strong></li>
-            <li>Si paga a notte</li>
+            <li>Check-in <strong>from 15:00</strong></li>
+            <li>Check-out <strong>by 11:00</strong></li>
+            <li>Priced per night</li>
           </ul>
         </div>
 
@@ -602,7 +561,7 @@
           <!-- Contact cards -->
           <div class="contact-cards reveal-left">
             <a
-              href="https://wa.me/393299866890?text=Ciao!%20Vorrei%20informazioni%20su%20La%20Luna%20nel%20Pozzo%20a%20Molfetta."
+              href="https://wa.me/393299866890?text=Hi!%20I%27d%20like%20some%20information%20about%20La%20Luna%20nel%20Pozzo%20in%20Molfetta."
               class="contact-card contact-whatsapp"
               target="_blank"
               rel="noopener"
@@ -610,12 +569,12 @@
               <div class="contact-icon">💬</div>
               <div class="contact-info">
                 <strong>WhatsApp</strong>
-                <span>Risposta rapida — solitamente entro 1 ora</span>
+                <span>Quick reply — usually within 1 hour</span>
               </div>
               <span class="contact-arrow">→</span>
             </a>
             <a
-              href="mailto:lalunanelpozzo.molfetta@gmail.com?subject=Prenotazione%20La%20Luna%20nel%20Pozzo&body=Ciao!%20Vorrei%20prenotare%20l'appartamento%20per%20le%20seguenti%20date%3A%0A%0AData%20arrivo%3A%0AData%20partenza%3A%0ANumero%20ospiti%3A%0A%0AGrazie!"
+              href="mailto:lalunanelpozzo.molfetta@gmail.com?subject=Booking%20La%20Luna%20nel%20Pozzo&body=Hi!%20I%27d%20like%20to%20book%20the%20apartment%20for%20the%20following%20dates%3A%0A%0ACheck-in%3A%0ACheck-out%3A%0ANumber%20of%20guests%3A%0A%0AThank%20you!"
               class="contact-card contact-email"
               target="_blank"
               rel="noopener"
@@ -631,8 +590,8 @@
             <a href="#availability" class="contact-card contact-calendar">
               <div class="contact-icon">📅</div>
               <div class="contact-info">
-                <strong>Calendario disponibilità</strong>
-                <span>Sincronizzazione automatica del calendario</span>
+                <strong>Availability calendar</strong>
+                <span>Calendar synced automatically</span>
               </div>
               <span class="contact-arrow">↑</span>
             </a>
@@ -640,39 +599,39 @@
             <!-- Payment — DISABLED, enable when ready -->
             <div
               class="contact-card contact-payment disabled"
-              title="Disponibile presto"
+              title="Coming soon"
             >
               <div class="contact-icon">💳</div>
               <div class="contact-info">
-                <strong>Pagamento online</strong>
-                <span>Pagamento sicuro — prossimamente</span>
+                <strong>Online payment</strong>
+                <span>Secure payment — coming soon</span>
               </div>
-              <span class="coming-soon-tag">Presto</span>
+              <span class="coming-soon-tag">Soon</span>
             </div>
           </div>
 
           <!-- Inquiry form -->
           <div class="booking-form reveal-right">
-            <h3>Richiesta di disponibilità</h3>
+            <h3>Availability request</h3>
             <form id="inquiry-form" novalidate>
               <div class="form-row">
                 <div class="form-group">
-                  <label for="name">Nome</label>
+                  <label for="name">Name</label>
                   <input
                     type="text"
                     id="name"
                     name="name"
-                    placeholder="Mario Rossi"
+                    placeholder="John Smith"
                     required
                   />
                 </div>
                 <div class="form-group">
-                  <label for="guests">Ospiti</label>
+                  <label for="guests">Guests</label>
                   <select id="guests" name="guests">
-                    <option value="1">1 ospite</option>
-                    <option value="2" selected>2 ospiti</option>
-                    <option value="3">3 ospiti</option>
-                    <option value="4">4 ospiti</option>
+                    <option value="1">1 guest</option>
+                    <option value="2" selected>2 guests</option>
+                    <option value="3">3 guests</option>
+                    <option value="4">4 guests</option>
                   </select>
                 </div>
               </div>
@@ -687,7 +646,7 @@
                     required
                   />
                   <p class="field-hint" id="checkin-hint">
-                    Giorno di arrivo — dalle 15:00
+                    Arrival day — from 15:00
                   </p>
                 </div>
                 <div class="form-group">
@@ -700,7 +659,7 @@
                     required
                   />
                   <p class="field-hint" id="checkout-hint">
-                    Giorno di partenza — entro le 11:00
+                    Departure day — by 11:00
                   </p>
                 </div>
               </div>
@@ -710,25 +669,25 @@
                   type="email"
                   id="email"
                   name="email"
-                  placeholder="mario@email.com"
+                  placeholder="john@email.com"
                   required
                 />
               </div>
               <div class="form-group">
-                <label for="message">Messaggio (opzionale)</label>
+                <label for="message">Message (optional)</label>
                 <textarea
                   id="message"
                   name="message"
                   rows="3"
-                  placeholder="Qualcosa che vuoi dirci..."
+                  placeholder="Anything you'd like to tell us..."
                 ></textarea>
               </div>
               <button type="submit" class="btn btn-primary btn-full">
-                Invia richiesta via WhatsApp
+                Send request via WhatsApp
               </button>
               <p class="form-note">
-                Il messaggio verrà aperto in WhatsApp con tutti i dettagli già
-                compilati.
+                The message will open in WhatsApp with all the details already
+                filled in.
               </p>
             </form>
           </div>
@@ -736,10 +695,10 @@
 
         <!-- Also available on platforms -->
         <div class="platforms reveal-up">
-          <p>Ci trovi anche su:</p>
+          <p>You can also find us on:</p>
           <div class="platform-links">
             <a
-              href="https://www.airbnb.it/rooms/1734864830277819884"
+              href="https://www.airbnb.com/rooms/1734864830277819884"
               target="_blank"
               rel="noopener"
               class="platform-link"
@@ -747,7 +706,7 @@
               🏠 Airbnb
             </a>
             <a
-              href="https://www.booking.com/hotel/it/la-luna-nel-pozzo-molfetta.it.html"
+              href="https://www.booking.com/hotel/it/la-luna-nel-pozzo-molfetta.en-gb.html"
               target="_blank"
               rel="noopener"
               class="platform-link"
@@ -776,20 +735,20 @@
               </svg>
               <p class="footer-name">La Luna nel Pozzo</p>
             </div>
-            <p class="footer-location">Molfetta, Bari — Puglia, Italia</p>
+            <p class="footer-location">Molfetta, Bari — Puglia, Italy</p>
           </div>
           <div class="footer-links">
-            <h4>Navigazione</h4>
+            <h4>Navigation</h4>
             <ul>
-              <li><a href="#about">L'Appartamento</a></li>
-              <li><a href="#features">Comfort</a></li>
-              <li><a href="#gallery">Galleria</a></li>
-              <li><a href="#location">Posizione</a></li>
-              <li><a href="#booking">Prenota</a></li>
+              <li><a href="#about">The Apartment</a></li>
+              <li><a href="#features">Amenities</a></li>
+              <li><a href="#gallery">Gallery</a></li>
+              <li><a href="#location">Location</a></li>
+              <li><a href="#booking">Book</a></li>
             </ul>
           </div>
           <div class="footer-contact">
-            <h4>Contatti</h4>
+            <h4>Contact</h4>
             <ul>
               <li>
                 <a
@@ -807,11 +766,10 @@
         </div>
         <div class="footer-bottom">
           <p>
-            © 2026 La Luna nel Pozzo — Molfetta, Bari. Tutti i diritti
-            riservati.
+            © 2026 La Luna nel Pozzo — Molfetta, Bari. All rights reserved.
           </p>
           <p class="footer-note">
-            Prenota direttamente e risparmia sulle commissioni.
+            Book direct and save on booking fees.
           </p>
         </div>
       </div>
@@ -823,15 +781,15 @@
       id="lightbox"
       role="dialog"
       aria-modal="true"
-      aria-label="Galleria immagini"
+      aria-label="Image gallery"
     >
-      <button class="lightbox-close" id="lightbox-close" aria-label="Chiudi">
+      <button class="lightbox-close" id="lightbox-close" aria-label="Close">
         ✕
       </button>
-      <button class="lightbox-prev" id="lightbox-prev" aria-label="Precedente">
+      <button class="lightbox-prev" id="lightbox-prev" aria-label="Previous">
         ‹
       </button>
-      <button class="lightbox-next" id="lightbox-next" aria-label="Successivo">
+      <button class="lightbox-next" id="lightbox-next" aria-label="Next">
         ›
       </button>
       <div class="lightbox-content" id="lightbox-content"></div>
@@ -839,8 +797,8 @@
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="js/i18n.js"></script>
-    <script src="js/main.js"></script>
-    <script src="js/calendar.js"></script>
+    <script src="../js/i18n.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/calendar.js"></script>
   </body>
 </html>

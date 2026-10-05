@@ -18,6 +18,13 @@
   const root = document.getElementById('availability');
   if (!root) return;
 
+  const { t: tr, locale: LOCALE } = window.LunaI18n;
+  const WA_URL = 'https://wa.me/393299866890';
+
+  // Il file dei dati sta accanto alla cartella js/, non accanto alla pagina:
+  // da /en/ un percorso relativo alla pagina cercherebbe /en/data/.
+  const DATA_URL = new URL('../data/availability.json', document.currentScript.src).href;
+
   const elMonths = document.getElementById('cal-months');
   const elStatus = document.getElementById('cal-status');
   const elUpdated = document.getElementById('cal-updated');
@@ -28,9 +35,13 @@
   const inCheckout = document.getElementById('checkout');
 
   const DAY = 86400000;
-  const MONTHS = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
-                  'Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
-  const WEEKDAYS = ['L','M','M','G','V','S','D'];
+  const WEEKDAYS = tr('cal.weekdays');
+  /** "Ottobre 2026" / "October 2026", con la maiuscola in ogni lingua. */
+  const monthName = (ms) => {
+    const s = new Date(ms).toLocaleDateString(LOCALE,
+      { month: 'long', year: 'numeric', timeZone: 'UTC' });
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  };
 
   const toISO = (ms) => new Date(ms).toISOString().slice(0, 10);
   const fromISO = (s) => {
@@ -47,7 +58,7 @@
       ? ms
       : NaN;
   };
-  const fmtLong = (ms) => new Date(ms).toLocaleDateString('it-IT',
+  const fmtLong = (ms) => new Date(ms).toLocaleDateString(LOCALE,
     { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 
   const now = new Date();
@@ -105,7 +116,7 @@
       // `cache: no-cache` convince il browser ma non l'edge: serve un URL
       // diverso. Granularità al minuto — il file pesa meno di 1 KB.
       const bust = Math.floor(Date.now() / 60000);
-      const res = await fetch(`data/availability.json?t=${bust}`, { cache: 'no-cache' });
+      const res = await fetch(`${DATA_URL}?t=${bust}`, { cache: 'no-cache' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
 
@@ -152,9 +163,7 @@
         state.hover = null;
         syncForm();
         render();
-        elStatus.innerHTML =
-          'Le date che avevi scelto sono state appena prenotate altrove. ' +
-          'Scegline altre sul calendario.';
+        elStatus.innerHTML = tr('cal.lost');
         elStatus.classList.add('is-warn');
         return true;
       }
@@ -171,10 +180,7 @@
       }
       root.classList.remove('cal-loading');
       root.classList.add('cal-unavailable');
-      elStatus.innerHTML =
-        'Calendario temporaneamente non disponibile. ' +
-        '<a href="https://wa.me/393299866890" target="_blank" rel="noopener">Scrivici su WhatsApp</a> ' +
-        'e ti confermiamo le date in pochi minuti.';
+      elStatus.innerHTML = tr('cal.unavailable', { wa: WA_URL });
       elStatus.classList.add('is-warn');
       return false;
     }
@@ -186,14 +192,14 @@
     if (!elMinStay) return;
     const value = elMinStay.querySelector('strong');
     if (!value) return;
-    value.textContent = `${state.minNights} ${state.minNights === 1 ? 'notte' : 'notti'}`;
+    value.textContent = tr('cal.nights', { n: state.minNights });
   }
 
   /* La freschezza resta disponibile nei dati e nei log; al cliente mostriamo
      una dicitura neutra, senza esporre l'età dell'ultimo aggiornamento. */
   function paintUpdated() {
     if (!elUpdated) return;
-    elUpdated.textContent = 'Disponibilità sincronizzata automaticamente';
+    elUpdated.textContent = tr('cal.updated');
     elUpdated.classList.remove('is-stale');
   }
 
@@ -265,7 +271,7 @@
     const wrap = document.createElement('div');
     wrap.className = 'cal-month';
     wrap.innerHTML =
-      `<div class="cal-month-name">${MONTHS[month]} ${year}</div>` +
+      `<div class="cal-month-name">${monthName(firstMs)}</div>` +
       `<div class="cal-weekdays">${WEEKDAYS.map((w) => `<span>${w}</span>`).join('')}</div>`;
 
     const grid = document.createElement('div');
@@ -317,14 +323,14 @@
       btn.disabled = past || !selectable;
 
       let label = fmtLong(ms);
-      if (past) label += ' — non prenotabile';
+      if (past) label += tr('cal.day.past');
       else if (booked) {
         // La notte è di un altro ospite, ma la mattina è ancora libera: la data
         // resta valida come NOSTRA partenza (si vende la notte, non la giornata).
         label += isBooked(ms - DAY)
-          ? ' — occupato'
-          : ` — occupato dalle ${state.checkinFrom}, puoi solo partire entro le ${state.checkoutBy}`;
-      } else label += ' — libero';
+          ? tr('cal.day.booked')
+          : tr('cal.day.bookedTurnover', { from: state.checkinFrom, by: state.checkoutBy });
+      } else label += tr('cal.day.free');
 
       btn.setAttribute('aria-label', label);
       btn.title = label;
@@ -441,31 +447,30 @@
         const target = firstFreeFrom(state.cursor) ?? firstFreeFrom(TODAY);
         elStatus.classList.add('is-warn');
         elStatus.innerHTML = target
-          ? `Nessuna disponibilità in questo periodo. ` +
+          ? tr('cal.status.noneHere') +
             `<button type="button" class="cal-jump" data-goto="${toISO(target)}">` +
-            `Vai al ${fmtLong(target)}</button>`
-          : 'Nessuna disponibilità nei prossimi mesi. ' +
-            '<a href="https://wa.me/393299866890" target="_blank" rel="noopener">Scrivici</a> ' +
-            'e ti avvisiamo appena si libera qualcosa.';
+            `${tr('cal.status.jump', { date: fmtLong(target) })}</button>`
+          : tr('cal.status.noneAhead', { wa: WA_URL });
         return;
       }
-      elStatus.innerHTML =
-        `Tocca il giorno di <strong>arrivo</strong>, poi quello di <strong>partenza</strong>. ` +
-        `Minimo ${state.minNights} notti.`;
+      elStatus.innerHTML = tr('cal.status.start', { min: state.minNights });
       return;
     }
     if (state.checkout === null) {
-      elStatus.innerHTML =
-        `Arrivo <strong>${fmtLong(state.checkin)}</strong> dalle ${state.checkinFrom} — ` +
-        `ora tocca il giorno di partenza.`;
+      elStatus.innerHTML = tr('cal.status.arrival', {
+        date: fmtLong(state.checkin),
+        from: state.checkinFrom,
+      });
       return;
     }
     const n = (state.checkout - state.checkin) / DAY;
-    elStatus.innerHTML =
-      `<strong>${fmtLong(state.checkin)}</strong> dalle ${state.checkinFrom} → ` +
-      `<strong>${fmtLong(state.checkout)}</strong> entro le ${state.checkoutBy} · ` +
-      `${n} ${n === 1 ? 'notte' : 'notti'} · disponibile. ` +
-      `Compila il modulo qui sotto per inviare la richiesta.`;
+    elStatus.innerHTML = tr('cal.status.range', {
+      checkin: fmtLong(state.checkin),
+      checkout: fmtLong(state.checkout),
+      checkinFrom: state.checkinFrom,
+      checkoutBy: state.checkoutBy,
+      nights: n,
+    });
   }
 
   /* ── navigazione ───────────────────────────────────── */
@@ -524,29 +529,29 @@
         return {
           ok: false,
           code: 'not-ready',
-          reason: 'Il calendario non è ancora pronto: attendi qualche secondo e riprova.',
+          reason: tr('cal.check.notReady'),
         };
       }
       const a = fromISO(checkinISO);
       const b = fromISO(checkoutISO);
       if (Number.isNaN(a) || Number.isNaN(b)) {
-        return { ok: false, code: 'invalid-date', reason: 'Controlla le date selezionate.' };
+        return { ok: false, code: 'invalid-date', reason: tr('cal.check.invalidDate') };
       }
-      if (a < TODAY) return { ok: false, reason: 'La data di arrivo è nel passato.' };
+      if (a < TODAY) return { ok: false, reason: tr('cal.check.past') };
       if (a >= state.horizonEnd) {
-        return { ok: false, field: 'checkin', reason: 'La data di arrivo è oltre il periodo prenotabile.' };
+        return { ok: false, field: 'checkin', reason: tr('cal.check.checkinBeyond') };
       }
       if (b > state.horizonEnd) {
-        return { ok: false, field: 'checkout', reason: 'La data di partenza è oltre il periodo prenotabile.' };
+        return { ok: false, field: 'checkout', reason: tr('cal.check.checkoutBeyond') };
       }
       if (b <= a) {
-        return { ok: false, field: 'checkout', reason: 'La partenza deve venire dopo l’arrivo.' };
+        return { ok: false, field: 'checkout', reason: tr('form.checkout.beforeCheckin') };
       }
       if ((b - a) / DAY < state.minNights) {
         return {
           ok: false,
           field: 'checkout',
-          reason: `Il soggiorno minimo è di ${state.minNights} notti.`,
+          reason: tr('cal.check.minStay', { min: state.minNights }),
         };
       }
       for (let t = a; t < b; t += DAY) {
@@ -555,7 +560,7 @@
             ok: false,
             code: 'booked',
             field: t === a ? 'checkin' : 'checkout',
-            reason: `${fmtLong(t)} non è disponibile. Scegli altre date sul calendario.`,
+            reason: tr('cal.check.booked', { date: fmtLong(t) }),
           };
         }
       }
@@ -609,9 +614,8 @@
 
     const first = [...state.rejected].sort()[0];
     return state.rejected.size === 1
-      ? `Il ${fmtLong(fromISO(first))} non è disponibile.`
-      : `${state.rejected.size} notti del periodo scelto non sono disponibili, ` +
-        `a partire dal ${fmtLong(fromISO(first))}.`;
+      ? tr('cal.typed.one', { date: fmtLong(fromISO(first)) })
+      : tr('cal.typed.many', { n: state.rejected.size, date: fmtLong(fromISO(first)) });
   }
 
   /** Porta il calendario sul mese di una data e la mostra. */
@@ -635,7 +639,7 @@
         // disponibile" mentre a schermo c'è un altro mese non aiuta nessuno.
         focusMonthOf(fromISO([...state.rejected].sort()[0]));
         render();
-        elStatus.innerHTML = `${problem} Le notti in rosso sono già prenotate — scegline altre.`;
+        elStatus.innerHTML = tr('cal.typed.status', { problem });
         elStatus.classList.add('is-warn');
         window.dispatchEvent(new CustomEvent('luna:dates-rejected', { detail: { problem } }));
         return;

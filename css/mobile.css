@@ -119,6 +119,22 @@
 
   .nav-logo { min-height: 44px; }
 
+  /* Il menu fullscreen esce dal flusso: il selettore resta accanto
+     all'hamburger, sopra il menu aperto, così la lingua si cambia sempre. */
+  .lang-switch {
+    margin-left: auto;
+    margin-right: 0.35rem;
+    position: relative;
+    z-index: 1000;
+  }
+  .lang-switch > * {
+    min-width: 36px;
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   /* Comandi zoom di Leaflet: 30px di default, troppo piccoli per un dito */
   .leaflet-touch .leaflet-bar a {
     width: 40px;

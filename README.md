@@ -16,6 +16,10 @@ portali.
   Booking.com tramite i feed iCal.
 - **Richiesta di prenotazione** — il modulo apre WhatsApp con le date già
   compilate; nessun pagamento online.
+- **Italiano e inglese** — `/` è la versione italiana (quella principale per
+  Google), `/en/` quella inglese. Alla prima visita chi ha il browser in
+  un'altra lingua viene portato su `/en/`; il selettore `IT · EN` in alto
+  permette sempre di cambiare e la scelta viene ricordata.
 
 ## Come funziona
 
@@ -32,12 +36,17 @@ Airbnb / Booking ──► GitHub Actions (ogni 15 min) ──► data/availabil
 
 | Percorso | Contenuto |
 |---|---|
-| `index.html` | Pagina del sito |
+| `index.html` | Pagina del sito in italiano |
+| `en/index.html` | Pagina del sito in inglese |
 | `css/` | Stili (desktop e mobile) |
 | `js/` | Logica del sito e del calendario |
+| `js/i18n.js` | Testi generati da JS (modulo, calendario, WhatsApp) nelle due lingue |
 | `data/` | Disponibilità e prenotazioni dirette |
 | `calendar/direct.ics` | Export iCal delle prenotazioni dirette |
 | `scripts/sync-ical.mjs` | Script di sincronizzazione dei calendari |
 | `images/` | Foto dell'appartamento |
+
+Quando cambi un testo fisso del sito, cambialo in **entrambe** le pagine
+(`index.html` e `en/index.html`).
 
 Per la gestione quotidiana del calendario vedi [CALENDARIO.md](CALENDARIO.md).

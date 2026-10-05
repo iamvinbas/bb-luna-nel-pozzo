@@ -335,6 +335,37 @@ ul { list-style: none; }
   transform: translateY(-1px);
 }
 
+/* Selettore di lingua. Il margine automatico sulle voci del menu le tiene
+   accostate al selettore invece di lasciarle a metà fra logo e lingua. */
+.nav-links { margin-left: auto; }
+
+.lang-switch {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  margin-left: 1.5rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.lang-switch > * {
+  padding: 0.3rem 0.45rem;
+  border-radius: 6px;
+}
+
+.lang-switch a {
+  color: rgba(255,255,255,0.6);
+  transition: color 0.2s;
+}
+
+.lang-switch a:hover { color: var(--gold); }
+
+.lang-current {
+  color: var(--gold);
+  box-shadow: inset 0 0 0 1px rgba(201,168,76,0.55);
+}
+
 .hamburger {
   display: none;
   flex-direction: column;

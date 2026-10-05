@@ -9,6 +9,9 @@ const mqMobile  = window.matchMedia('(max-width: 768px)');
 const mqReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 const isMobile  = () => mqMobile.matches;
 
+/* Testi a runtime nella lingua della pagina: vedi js/i18n.js. */
+const { t: tr, locale: LOCALE } = window.LunaI18n;
+
 /* Blocco scroll di sfondo (menu, lightbox).
    position:fixed sul body perde la posizione di scroll: la salvo e la
    ripristino, altrimenti chiudendo l'overlay si torna in cima alla pagina. */
@@ -122,7 +125,7 @@ function buildSlides() {
       (src
         ? `<img src="${src}" alt="${alt}" draggable="false" />`
         : `<div class="lightbox-missing">📸<br/>${caption}<br/>` +
-          `<small>Foto disponibile presto</small></div>`) +
+          `<small>${tr('lightbox.missing')}</small></div>`) +
       `</div>`)
     .join('');
 }
@@ -289,7 +292,7 @@ const todayUTC = () => {
   return Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate());
 };
 const fmtDay = (iso) =>
-  new Date(parseDay(iso)).toLocaleDateString('it-IT', {
+  new Date(parseDay(iso)).toLocaleDateString(LOCALE, {
     day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC',
   });
 
@@ -300,36 +303,37 @@ function validateField(id) {
 
   switch (id) {
     case 'name':
-      if (!value) return 'Serve il tuo nome per la richiesta.';
-      if (value.length < 2) return 'Scrivi il nome per esteso.';
+      if (!value) return tr('form.name.empty');
+      if (value.length < 2) return tr('form.name.short');
       return null;
 
     case 'email':
-      if (!value) return 'Serve la tua email per risponderti.';
-      if (!EMAIL_RE.test(value)) return 'Controlla la email: manca qualcosa (esempio: mario@email.com).';
+      if (!value) return tr('form.email.empty');
+      if (!EMAIL_RE.test(value)) return tr('form.email.invalid');
       return null;
 
     case 'checkin': {
-      if (!value) return 'Scegli il giorno di arrivo.';
+      if (!value) return tr('form.checkin.empty');
       const d = parseDay(value);
-      if (Number.isNaN(d)) return 'Data di arrivo non valida.';
-      if (d < todayUTC()) return 'La data di arrivo è già passata.';
+      if (Number.isNaN(d)) return tr('form.checkin.invalid');
+      if (d < todayUTC()) return tr('form.checkin.past');
       return null;
     }
 
     case 'checkout': {
-      if (!value) return 'Scegli il giorno di partenza.';
+      if (!value) return tr('form.checkout.empty');
       const d = parseDay(value);
-      if (Number.isNaN(d)) return 'Data di partenza non valida.';
+      if (Number.isNaN(d)) return tr('form.checkout.invalid');
       const a = parseDay(form.elements.checkin.value);
       if (!Number.isNaN(a)) {
-        if (d <= a) return 'La partenza deve venire dopo l’arrivo.';
+        if (d <= a) return tr('form.checkout.beforeCheckin');
         const nights = (d - a) / DAY_MS;
         const min = window.LunaAvailability?.minNights ?? 2;
         if (nights < min) {
-          return `Il soggiorno minimo è di ${min} notti: scegli almeno il ${fmtDay(
-            new Date(a + min * DAY_MS).toISOString().slice(0, 10),
-          )}.`;
+          return tr('form.checkout.minStay', {
+            min,
+            date: fmtDay(new Date(a + min * DAY_MS).toISOString().slice(0, 10)),
+          });
         }
       }
       return null;
@@ -406,8 +410,8 @@ function validateFormFields() {
   const [firstId] = problems[0];
   showFormError(
     problems.length === 1
-      ? 'Manca un dato: controlla il campo evidenziato.'
-      : `Mancano ${problems.length} dati: controlla i campi evidenziati.`,
+      ? tr('form.missingOne')
+      : tr('form.missingMany', { n: problems.length }),
   );
   const first = form.elements[firstId];
   first.focus({ preventScroll: true });
@@ -443,7 +447,7 @@ FIELDS.forEach((id) => {
 /* Il calendario controlla le date appena vengono digitate e segna di rosso le
    notti occupate. Qui si chiude il cerchio sul campo, senza aspettare l'invio. */
 window.addEventListener('luna:dates-rejected', (e) => {
-  setFieldError('checkin', e.detail.problem + ' Guarda le celle in rosso sul calendario.');
+  setFieldError('checkin', `${e.detail.problem} ${tr('form.seeCalendar')}`);
 });
 
 form.addEventListener('submit', async (e) => {
@@ -456,9 +460,7 @@ form.addEventListener('submit', async (e) => {
   // arrivata dopo il caricamento della pagina non passa con dati vecchi.
   const availability = window.LunaAvailability;
   if (!availability?.loaded) {
-    showFormError(
-      'Non riesco ancora a verificare la disponibilità. Attendi il caricamento del calendario e riprova.',
-    );
+    showFormError(tr('form.notReady'));
     availability?.scrollToCalendar();
     return;
   }
@@ -467,7 +469,7 @@ form.addEventListener('submit', async (e) => {
   const submitLabel = submitButton?.textContent;
   if (submitButton) {
     submitButton.disabled = true;
-    submitButton.textContent = 'Verifico disponibilità…';
+    submitButton.textContent = tr('form.verifying');
   }
 
   let refreshed = false;
@@ -483,9 +485,7 @@ form.addEventListener('submit', async (e) => {
   }
 
   if (!refreshed || !availability.loaded) {
-    showFormError(
-      'Non riesco a verificare la disponibilità in questo momento. Attendi e riprova.',
-    );
+    showFormError(tr('form.cannotVerify'));
     availability.scrollToCalendar();
     return;
   }
@@ -513,15 +513,17 @@ form.addEventListener('submit', async (e) => {
   const times = window.LunaAvailability?.times ?? { checkinFrom: '15:00', checkoutBy: '11:00' };
 
   const waText = encodeURIComponent(
-    `Ciao! Vorrei prenotare *La Luna nel Pozzo* a Molfetta 🌙\n\n` +
-    `👤 Nome: ${name}\n` +
-    `📅 Arrivo: ${fmtDay(checkin)} (dalle ${times.checkinFrom})\n` +
-    `📅 Partenza: ${fmtDay(checkout)} (entro le ${times.checkoutBy})\n` +
-    `🌙 Notti: ${nights}\n` +
-    `👥 Ospiti: ${guests}\n` +
-    `✉️ Email: ${email}` +
-    (message ? `\n\n💬 ${message}` : '') +
-    `\n\nGrazie!`
+    tr('wa.booking', {
+      name,
+      checkin: fmtDay(checkin),
+      checkout: fmtDay(checkout),
+      checkinFrom: times.checkinFrom,
+      checkoutBy: times.checkoutBy,
+      nights,
+      guests,
+      email,
+      message,
+    }),
   );
 
   const waNumber = '393299866890';
@@ -534,16 +536,15 @@ form.addEventListener('submit', async (e) => {
   // Se il browser blocca il pop-up la richiesta sparisce nel nulla senza che
   // l'utente se ne accorga: meglio dargli un link da toccare.
   if (!win) {
-    showFormError('Il browser ha bloccato l’apertura di WhatsApp.');
+    showFormError(tr('form.popupBlocked'));
     formError.insertAdjacentHTML(
       'beforeend',
-      ` <a href="https://wa.me/${waNumber}?text=${waText}" target="_blank" rel="noopener">Apri WhatsApp</a>`,
+      ` <a href="https://wa.me/${waNumber}?text=${waText}" target="_blank" rel="noopener">${tr('form.openWhatsApp')}</a>`,
     );
     return;
   }
 
-  form.querySelector('.form-note').textContent =
-    'Richiesta aperta in WhatsApp — premi invio lì per mandarcela.';
+  form.querySelector('.form-note').textContent = tr('form.sent');
 });
 
 /* ── CITY PHOTO PARALLAX ────────────────────────────── */
@@ -731,7 +732,7 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
      Un dito = scorri la pagina, due dita = muovi la mappa. */
   const hint = document.createElement('div');
   hint.className = 'map-gesture-hint';
-  hint.textContent = 'Usa due dita per muovere la mappa';
+  hint.textContent = tr('map.twoFingers');
   hint.setAttribute('aria-hidden', 'true');
   mapEl.appendChild(hint);
 
