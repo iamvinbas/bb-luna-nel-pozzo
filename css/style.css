@@ -1708,6 +1708,18 @@ ul { list-style: none; }
   gap: 0.3rem;
 }
 
+.footer-legal {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.3rem 1.5rem;
+  margin-top: 0.5rem;
+  color: rgba(255,255,255,0.4);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
 /* ── LIGHTBOX ───────────────────────────────────────── */
 .lightbox {
   position: fixed;
