@@ -598,9 +598,78 @@ mqMobile.addEventListener('change', syncParallax);
 mqReduced.addEventListener('change', syncParallax);
 
 /* ── SMOOTH SCROLL for anchor links ────────────────── */
+/* Posizione nel documento senza i transform: i blocchi .reveal-* sono ancora
+   spostati di 30-40px finché non entrano in vista, e getBoundingClientRect
+   misurerebbe proprio quello spostamento. */
+const docTop = (el) => {
+  let y = 0;
+  for (let e = el; e; e = e.offsetParent) y += e.offsetTop;
+  return y;
+};
+
+/* "Prenota" porta al calendario, centrato nello spazio sotto la navbar.
+   Si centra il pezzo più grande che ci sta: tutto il riquadro (titolo,
+   legenda, mesi, orari) sugli schermi alti; solo mesi + riga di stato su
+   telefoni bassi e portatili; se nemmeno i mesi ci stanno (telefono in
+   orizzontale) li si allinea sotto la navbar, così il primo giorno è visibile. */
+function bookingScrollTop() {
+  const card = document.getElementById('availability');
+  const cal = card?.querySelector('.cal');
+  if (!cal) return null;
+  const status = card.querySelector('.cal-status');
+  const nav = navbar.offsetHeight;
+  const room = window.innerHeight - nav;
+  const blocks = [[card, card], [cal, status || cal], [cal, cal]];
+  for (const [first, last] of blocks) {
+    const top = docTop(first);
+    const height = docTop(last) + last.offsetHeight - top;
+    if (height <= room - 16) return top - nav - (room - height) / 2;
+  }
+  return docTop(cal) - nav - 8;
+}
+
+/* Durante lo scroll la navbar si accorcia, le foto lazy sopra caricano e la
+   barra del browser su telefono si chiude: il punto calcolato al tocco può
+   spostarsi. Quando lo scroll si ferma ricalcolo e, se serve, correggo. */
+function scrollToBooking() {
+  const behavior = mqReduced.matches ? 'instant' : 'smooth';
+  const go = () => {
+    const top = bookingScrollTop();
+    if (top === null) return false;
+    window.scrollTo({ top: Math.max(0, top), behavior });
+    return true;
+  };
+  if (!go()) return false;
+
+  let lastY = -1;
+  let still = 0;
+  let corrections = 0;
+  const started = performance.now();
+  const watch = () => {
+    if (performance.now() - started > 4000) return;
+    still = window.scrollY === lastY ? still + 1 : 0;
+    lastY = window.scrollY;
+    if (still < 8) return requestAnimationFrame(watch);
+    const top = Math.max(0, bookingScrollTop());
+    const maxY = document.documentElement.scrollHeight - window.innerHeight;
+    if (Math.abs(Math.min(top, maxY) - window.scrollY) > 4 && corrections++ < 2) {
+      window.scrollTo({ top, behavior });
+      still = 0;
+    } else return;
+    requestAnimationFrame(watch);
+  };
+  requestAnimationFrame(watch);
+  return true;
+}
+
 document.querySelectorAll('a[href^="#"]').forEach(link => {
   link.addEventListener('click', e => {
-    const target = document.querySelector(link.getAttribute('href'));
+    const hash = link.getAttribute('href');
+    if (hash === '#booking') {
+      if (scrollToBooking()) e.preventDefault();
+      return;
+    }
+    const target = document.querySelector(hash);
     if (!target) return;
     e.preventDefault();
     const offset = navbar.offsetHeight + 20;
