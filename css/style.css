@@ -1699,9 +1699,8 @@ ul { list-style: none; }
 .footer-links a:hover,
 .footer-contact a:hover { color: var(--gold); }
 
-/* Le altre voci usano un'emoji come icona; Instagram e Facebook non ne
-   hanno una, quindi il logo è un SVG allineato e dimensionato come le emoji
-   accanto. */
+/* Icone dei contatti nel footer: loghi SVG nel colore del testo, così
+   seguono anche l'hover dorato. */
 .footer-social {
   display: inline-flex;
   align-items: center;
@@ -1996,6 +1995,35 @@ ul { list-style: none; }
   outline: 3px solid var(--gold);
   outline-offset: 3px;
 }
+
+/* ── AVVISO EMAIL COPIATA ───────────────────────────── */
+/* Centrato in basso, sopra il pulsante WhatsApp. left/right fissi invece di
+   left:50% + translate: così su telefono può usare tutta la larghezza meno
+   i margini, invece di fermarsi a metà schermo. */
+.mail-toast {
+  position: fixed;
+  left: 1rem;
+  right: 1rem;
+  bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
+  z-index: 950;
+  width: fit-content;
+  max-width: 34rem;
+  margin-inline: auto;
+  padding: 0.8rem 1.2rem;
+  border-radius: var(--radius);
+  background: var(--navy-light);
+  color: var(--white);
+  font-size: 0.9rem;
+  text-align: center;
+  overflow-wrap: anywhere;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(201,168,76,0.35);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.mail-toast.show { opacity: 1; transform: none; }
 
 /* ── PREFERENZA: MENO ANIMAZIONI ────────────────────── */
 /* Rispetta l'impostazione di sistema e, di riflesso, toglie proprio le

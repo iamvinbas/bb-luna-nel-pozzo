@@ -67,6 +67,9 @@ window.LunaI18n = (function () {
         `👥 Ospiti: [numero]\n\n` +
         `Grazie mille, a presto! 😊`,
 
+      'mail.copied': ({ email }) => `Indirizzo copiato: ${email} — incollalo nella tua email.`,
+      'mail.writeTo': ({ email }) => `Scrivici a ${email}`,
+
       'cal.weekdays': ['L', 'M', 'M', 'G', 'V', 'S', 'D'],
       'cal.nights': ({ n }) => nightsIt(n),
       'cal.updated': 'Disponibilità sincronizzata automaticamente',
@@ -159,6 +162,9 @@ window.LunaI18n = (function () {
         `📅 Check-out: ${checkout || '[departure date]'}\n` +
         `👥 Guests: [number]\n\n` +
         `Thank you so much, speak soon! 😊`,
+
+      'mail.copied': ({ email }) => `Address copied: ${email} — paste it into your email.`,
+      'mail.writeTo': ({ email }) => `Write to us at ${email}`,
 
       'cal.weekdays': ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
       'cal.nights': ({ n }) => nightsEn(n),

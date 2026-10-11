@@ -861,18 +861,56 @@ const today = new Date().toISOString().split('T')[0];
 document.getElementById('checkin').min = today;
 document.getElementById('checkout').min = today;
 
-/* ── WHATSAPP FISSO ─────────────────────────────────── */
-/* L'href nell'HTML ha già il messaggio con i segnaposto, così il pulsante
-   funziona anche senza JS. Al tocco, se sul calendario sono già state scelte
+/* ── WHATSAPP: PULSANTE FISSO E FOOTER ──────────────── */
+/* L'href nell'HTML ha già il messaggio con i segnaposto, così i link
+   funzionano anche senza JS. Al tocco, se sul calendario sono già state scelte
    due date valide, le scrivo nel messaggio al posto dei segnaposto. */
-(function () {
-  const btn = document.getElementById('wa-float');
-  if (!btn) return;
-  btn.addEventListener('click', () => {
+document.querySelectorAll('[data-wa-quick]').forEach((link) => {
+  link.addEventListener('click', () => {
     const a = form.elements.checkin.value;
     const b = form.elements.checkout.value;
     const ok = !Number.isNaN(parseDay(a)) && parseDay(b) > parseDay(a);
     const text = tr('wa.float', ok ? { checkin: fmtDay(a), checkout: fmtDay(b) } : {});
-    btn.href = `https://wa.me/393299866890?text=${encodeURIComponent(text)}`;
+    link.href = `https://wa.me/393299866890?text=${encodeURIComponent(text)}`;
   });
-})();
+});
+
+/* ── EMAIL SENZA PROGRAMMA DI POSTA ─────────────────── */
+/* Su un computer senza app di posta predefinita un link mailto: non fa
+   nulla, e chi ci clica pensa che il sito sia rotto. Se dopo il clic la
+   pagina non perde il fuoco (nessuna app si è aperta) copio l'indirizzo e
+   lo mostro in un avviso, così si può incollare nella propria webmail. */
+const mailToast = document.createElement('div');
+mailToast.className = 'mail-toast';
+mailToast.setAttribute('role', 'status');
+mailToast.setAttribute('aria-live', 'polite');
+document.body.appendChild(mailToast);
+let mailToastTimer;
+
+function showMailToast(text) {
+  mailToast.textContent = text;
+  mailToast.classList.add('show');
+  clearTimeout(mailToastTimer);
+  mailToastTimer = setTimeout(() => mailToast.classList.remove('show'), 6000);
+}
+
+document.querySelectorAll('a[href^="mailto:"]').forEach((link) => {
+  link.addEventListener('click', () => {
+    const email = decodeURIComponent(link.getAttribute('href').slice(7).split('?')[0]);
+    let left = false;
+    const onLeave = () => { left = true; };
+    window.addEventListener('blur', onLeave, { once: true });
+    document.addEventListener('visibilitychange', onLeave, { once: true });
+    setTimeout(async () => {
+      window.removeEventListener('blur', onLeave);
+      document.removeEventListener('visibilitychange', onLeave);
+      if (left) return;
+      try {
+        await navigator.clipboard.writeText(email);
+        showMailToast(tr('mail.copied', { email }));
+      } catch (e) {
+        showMailToast(tr('mail.writeTo', { email }));
+      }
+    }, 1200);
+  });
+});
