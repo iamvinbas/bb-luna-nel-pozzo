@@ -19,7 +19,9 @@
   if (!root) return;
 
   const { t: tr, locale: LOCALE } = window.LunaI18n;
-  const WA_URL = 'https://wa.me/393299866890';
+  // Stesso messaggio del pulsante WhatsApp fisso e del footer
+  const WA_URL =
+    `https://wa.me/393299866890?text=${encodeURIComponent(tr('wa.float'))}`;
 
   // Il file dei dati sta accanto alla cartella js/, non accanto alla pagina:
   // da /en/ un percorso relativo alla pagina cercherebbe /en/data/.
