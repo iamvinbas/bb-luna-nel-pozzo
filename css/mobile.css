@@ -19,7 +19,8 @@
   .gallery-item:hover img,
   .gallery-item:hover .img-placeholder,
   .btn:hover,
-  .nav-cta:hover {
+  .nav-cta:hover,
+  .wa-float:hover {
     transform: none;
   }
 
@@ -429,11 +430,16 @@
   .footer-brand-name { justify-content: center; }
   .footer-links ul,
   .footer-contact ul { align-items: flex-start; }
-  .footer { padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px)); }
+  /* Spazio in fondo per il pulsante WhatsApp fisso: senza, a fine pagina
+     coprirebbe la riga con CIS/CIN e copyright. */
+  .footer { padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px)); }
 }
 
 /* ── SMARTPHONE (≤ 480px) ───────────────────────────── */
 @media (max-width: 480px) {
+  .wa-float { width: 54px; height: 54px; }
+  .wa-float svg { width: 29px; height: 29px; }
+
 
   /* Telefono: margini stretti, sezioni ravvicinate. Sotto questa soglia un
      gutter più largo toglierebbe righe di testo utile senza dare respiro. */
@@ -576,4 +582,6 @@
   .nav-links { gap: 1rem; justify-content: flex-start; }
   .nav-links a { font-size: 1.05rem; }
   .location-map-full { height: 300px; }
+  .wa-float { width: 48px; height: 48px; }
+  .wa-float svg { width: 26px; height: 26px; }
 }

@@ -791,3 +791,19 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
 const today = new Date().toISOString().split('T')[0];
 document.getElementById('checkin').min = today;
 document.getElementById('checkout').min = today;
+
+/* ── WHATSAPP FISSO ─────────────────────────────────── */
+/* L'href nell'HTML ha già il messaggio con i segnaposto, così il pulsante
+   funziona anche senza JS. Al tocco, se sul calendario sono già state scelte
+   due date valide, le scrivo nel messaggio al posto dei segnaposto. */
+(function () {
+  const btn = document.getElementById('wa-float');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    const a = form.elements.checkin.value;
+    const b = form.elements.checkout.value;
+    const ok = !Number.isNaN(parseDay(a)) && parseDay(b) > parseDay(a);
+    const text = tr('wa.float', ok ? { checkin: fmtDay(a), checkout: fmtDay(b) } : {});
+    btn.href = `https://wa.me/393299866890?text=${encodeURIComponent(text)}`;
+  });
+})();

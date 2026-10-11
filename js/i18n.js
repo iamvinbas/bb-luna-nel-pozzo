@@ -57,6 +57,16 @@ window.LunaI18n = (function () {
         (v.message ? `\n\n💬 ${v.message}` : '') +
         `\n\nGrazie!`,
 
+      /* Pulsante fisso in basso a sinistra: date già scelte sul calendario
+         se ci sono, altrimenti segnaposto da completare in chat. */
+      'wa.float': ({ checkin, checkout }) =>
+        `Ciao! 👋 Mi piacerebbe soggiornare a *La Luna nel Pozzo* a Molfetta 🌙\n` +
+        `Avete disponibilità per queste date?\n\n` +
+        `📅 Check-in: ${checkin || '[data di arrivo]'}\n` +
+        `📅 Check-out: ${checkout || '[data di partenza]'}\n` +
+        `👥 Ospiti: [numero]\n\n` +
+        `Grazie mille, a presto! 😊`,
+
       'cal.weekdays': ['L', 'M', 'M', 'G', 'V', 'S', 'D'],
       'cal.nights': ({ n }) => nightsIt(n),
       'cal.updated': 'Disponibilità sincronizzata automaticamente',
@@ -141,6 +151,14 @@ window.LunaI18n = (function () {
         `✉️ Email: ${v.email}` +
         (v.message ? `\n\n💬 ${v.message}` : '') +
         `\n\nThank you!`,
+
+      'wa.float': ({ checkin, checkout }) =>
+        `Hi! 👋 I'd love to stay at *La Luna nel Pozzo* in Molfetta 🌙\n` +
+        `Do you have availability for these dates?\n\n` +
+        `📅 Check-in: ${checkin || '[arrival date]'}\n` +
+        `📅 Check-out: ${checkout || '[departure date]'}\n` +
+        `👥 Guests: [number]\n\n` +
+        `Thank you so much, speak soon! 😊`,
 
       'cal.weekdays': ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
       'cal.nights': ({ n }) => nightsEn(n),
