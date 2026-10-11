@@ -1699,9 +1699,10 @@ ul { list-style: none; }
 .footer-links a:hover,
 .footer-contact a:hover { color: var(--gold); }
 
-/* Le altre voci usano un'emoji come icona; Instagram non ne ha una, quindi
-   il logo è un SVG allineato e dimensionato come le emoji accanto. */
-.footer-instagram {
+/* Le altre voci usano un'emoji come icona; Instagram e Facebook non ne
+   hanno una, quindi il logo è un SVG allineato e dimensionato come le emoji
+   accanto. */
+.footer-social {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
