@@ -495,9 +495,17 @@
   .contact-info strong { font-size: 0.95rem; }
   .contact-info span { font-size: 0.8rem; }
 
-  /* ── Platform links */
-  .platform-links { flex-direction: column; align-items: center; gap: 0.6rem; }
-  .platform-link { width: 100%; max-width: 260px; text-align: center; }
+  /* ── Platform links: affiancati, metà larghezza ciascuno. Prima erano
+       in colonna e occupavano due righe per due soli pulsanti. */
+  .platform-links { flex-wrap: nowrap; gap: 0.6rem; }
+  .platform-link {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 180px;
+    padding: 0.55rem 0.75rem;
+    gap: 0.45rem;
+    white-space: nowrap;
+  }
 
   /* ── Virtual tour preview */
   .tour-preview { flex-direction: column; padding: 1.5rem; width: 100%; }
@@ -544,6 +552,9 @@
 /* iPhone SE, Galaxy A d'ingresso e simili: qui i titoli grandi sono la
    prima cosa che sfonda il bordo. */
 @media (max-width: 380px) {
+  .platform-link { font-size: 0.82rem; padding: 0.5rem 0.55rem; gap: 0.35rem; }
+  .platform-logo { width: 18px; height: 18px; }
+
   :root {
     --gutter: 1rem;
     --section-y: 2.5rem;
