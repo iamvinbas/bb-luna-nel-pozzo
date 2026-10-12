@@ -914,3 +914,39 @@ document.querySelectorAll('a[href^="mailto:"]').forEach((link) => {
     }, 1200);
   });
 });
+
+/* ── RECENSIONI: "LEGGI TUTTO" ──────────────────────── */
+/* Su telefono mobile.css taglia i testi a dodici righe. Il pulsante compare
+   solo dove il taglio c'è davvero, e si ricalcola cambiando larghezza
+   (ruotando il telefono una recensione può starci per intero). */
+document.querySelectorAll('.review-card').forEach((card) => {
+  const text = card.querySelector('.review-text');
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'review-toggle';
+  btn.hidden = true;
+  text.after(btn);
+
+  const label = () => {
+    const open = card.classList.contains('is-open');
+    btn.textContent = tr(open ? 'reviews.less' : 'reviews.more');
+    btn.setAttribute('aria-expanded', String(open));
+  };
+  const sync = () => {
+    if (card.classList.contains('is-open')) return;
+    const clamped = text.scrollHeight > text.clientHeight + 2;
+    text.classList.toggle('is-clamped', clamped);
+    btn.hidden = !clamped;
+  };
+
+  btn.addEventListener('click', () => {
+    card.classList.toggle('is-open');
+    label();
+    if (!card.classList.contains('is-open')) sync();
+  });
+  label();
+  sync();
+  window.addEventListener('resize', sync, { passive: true });
+  // I font arrivano dopo: con quelli definitivi il testo cambia altezza
+  document.fonts?.ready.then(sync);
+});

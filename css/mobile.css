@@ -20,6 +20,7 @@
   .gallery-item:hover .img-placeholder,
   .btn:hover,
   .nav-cta:hover,
+  .score-badge:hover,
   .wa-float:hover {
     transform: none;
   }
@@ -43,6 +44,13 @@
 }
 
 /* ── TABLET E SOTTO (≤ 1024px) ──────────────────────── */
+/* ── TABLET ORIZZONTALE / PORTATILE STRETTO ─────────── */
+/* Tra 769 e 1000px la barra in alto non ha spazio per tutte le voci e va a
+   capo: "Recensioni" lascia il posto (resta nel footer e nel menu mobile). */
+@media (min-width: 769px) and (max-width: 1000px) {
+  .nav-optional { display: none; }
+}
+
 @media (max-width: 1024px) {
   /* Le spaziature non sono legate fra loro da un breakpoint all'altro: ogni
      fascia ridefinisce i tre token e ottiene il ritmo che le serve. Il resto
@@ -494,6 +502,59 @@
   .contact-icon { font-size: 1.5rem; }
   .contact-info strong { font-size: 0.95rem; }
   .contact-info span { font-size: 0.8rem; }
+
+  /* ── Recensioni: carosello come la galleria. Quattro schede impilate
+       erano tre schermate di testo prima di arrivare a Prenota; così si
+       scorrono di lato e si vede che ce ne sono altre. */
+  .reviews-scores { margin: -0.5rem 0 2rem; gap: 0.75rem; }
+  .score-badge { padding: 0.75rem 1rem; gap: 0.7rem; }
+  .score-value { font-size: 1.6rem; }
+
+  .reviews-grid {
+    display: flex;
+    columns: auto;
+    gap: 0.8rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    margin-inline: calc(-1 * var(--gutter));
+    padding: 0.25rem var(--gutter) 0.75rem;
+    scroll-padding-inline: var(--gutter);
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .reviews-grid::-webkit-scrollbar { display: none; }
+
+  .reviews-grid > .review-card {
+    flex: 0 0 86%;
+    margin-bottom: 0;
+    scroll-snap-align: start;
+  }
+
+  /* Testi lunghi tagliati a dodici righe con dissolvenza: senza, la scheda
+     più lunga superava l'altezza dello schermo. "Leggi tutto" (main.js)
+     compare solo dove il testo è stato davvero tagliato. */
+  .review-text {
+    max-height: calc(1.7em * 12);
+    overflow: hidden;
+    position: relative;
+  }
+  .review-text.is-clamped::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3.4em;
+    background: linear-gradient(rgba(255,255,255,0), var(--white));
+  }
+  .review-card.is-open .review-text { max-height: none; }
+  .review-card.is-open .review-text::after { display: none; }
+  /* Le schede fuori schermo non verrebbero mai "viste" dall'osservatore
+     delle comparse: nel carosello entrano già visibili. */
+  .review-card.reveal-up { opacity: 1; transform: none; }
+
+  .reviews-more { margin-top: 1.75rem; }
 
   /* ── Platform links: affiancati, metà larghezza ciascuno. Prima erano
        in colonna e occupavano due righe per due soli pulsanti. */

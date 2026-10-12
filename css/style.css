@@ -1102,6 +1102,161 @@ ul { list-style: none; }
   100% { transform: scale(0.6); opacity: 0; }
 }
 
+/* ── RECENSIONI ─────────────────────────────────────── */
+/* Fondo crema tra la mappa e la sezione Prenota (blu): chi ha appena letto
+   cosa dicono gli ospiti trova subito il calendario sotto. */
+.reviews {
+  padding: var(--section-y) 0;
+  background: var(--cream);
+}
+
+/* Due punteggi riassuntivi, uno per portale, cliccabili verso le pagine
+   originali: chi vuole verificare lo fa in un tocco. */
+.reviews-scores {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: -1.25rem 0 3rem;
+}
+
+.score-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  background: var(--white);
+  border: 1px solid var(--cream-dark);
+  border-radius: var(--radius-lg);
+  padding: 0.9rem 1.4rem;
+  box-shadow: var(--shadow-sm);
+  color: var(--text);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.score-badge:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+.score-logo { width: 30px; height: 30px; flex-shrink: 0; }
+
+.score-value {
+  font-family: var(--font-serif);
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--navy);
+}
+
+.score-text {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: var(--text-mid);
+}
+.score-text strong { color: var(--navy); font-size: 0.9rem; }
+
+.review-stars {
+  color: var(--gold);
+  letter-spacing: 0.12em;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+/* Colonne invece di griglia: le recensioni hanno lunghezze molto diverse e
+   in una griglia a righe la scheda corta lasciava un buco sotto di sé. */
+.reviews-grid {
+  columns: 2;
+  column-gap: 1.5rem;
+}
+.reviews-grid > .review-card {
+  break-inside: avoid;
+  margin-bottom: 1.5rem;
+}
+
+.review-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  background: var(--white);
+  border: 1px solid var(--cream-dark);
+  border-radius: var(--radius-lg);
+  padding: var(--card-pad);
+  box-shadow: var(--shadow-sm);
+}
+
+.review-text {
+  color: var(--text);
+  font-size: 0.98rem;
+  line-height: 1.7;
+}
+.review-text p + p { margin-top: 0.7rem; }
+
+.review-toggle {
+  align-self: flex-start;
+  margin-top: -0.4rem;
+  background: none;
+  border: 0;
+  padding: 0.25rem 0;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--terra);
+  cursor: pointer;
+}
+
+.review-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--cream-dark);
+}
+
+/* Iniziale al posto della foto: le foto profilo restano su Airbnb */
+.review-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--navy);
+  color: var(--gold);
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.review-who {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+  line-height: 1.35;
+}
+.review-who strong { color: var(--navy); font-size: 0.95rem; }
+.review-who span { color: var(--text-light); font-size: 0.8rem; }
+
+.review-logo { width: 22px; height: 22px; flex-shrink: 0; }
+
+.review-note {
+  margin-top: -0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-light);
+  font-style: italic;
+}
+
+.reviews-more {
+  text-align: center;
+  margin-top: 2.5rem;
+}
+.reviews-more a {
+  color: var(--terra);
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: color 0.2s;
+}
+.reviews-more a:hover { color: var(--navy); }
+
 /* ── BOOKING ────────────────────────────────────────── */
 .booking {
   padding: var(--section-y) 0;

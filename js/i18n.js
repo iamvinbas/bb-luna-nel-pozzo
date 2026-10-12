@@ -70,6 +70,9 @@ window.LunaI18n = (function () {
       'mail.copied': ({ email }) => `Indirizzo copiato: ${email} — incollalo nella tua email.`,
       'mail.writeTo': ({ email }) => `Scrivici a ${email}`,
 
+      'reviews.more': 'Leggi tutto',
+      'reviews.less': 'Mostra meno',
+
       'cal.weekdays': ['L', 'M', 'M', 'G', 'V', 'S', 'D'],
       'cal.nights': ({ n }) => nightsIt(n),
       'cal.updated': 'Disponibilità sincronizzata automaticamente',
@@ -165,6 +168,9 @@ window.LunaI18n = (function () {
 
       'mail.copied': ({ email }) => `Address copied: ${email} — paste it into your email.`,
       'mail.writeTo': ({ email }) => `Write to us at ${email}`,
+
+      'reviews.more': 'Read more',
+      'reviews.less': 'Show less',
 
       'cal.weekdays': ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
       'cal.nights': ({ n }) => nightsEn(n),
