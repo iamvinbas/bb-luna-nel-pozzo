@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-10T10:35:28.976Z",
+  "updated": "2026-11-10T18:14:10.165Z",
   "timezone": "Europe/Rome",
   "minNights": 2,
   "checkinFrom": "15:00",
@@ -10,7 +10,7 @@
   },
   "ranges": [
     {
-      "from": "2026-11-11",
+      "from": "2026-11-10",
       "to": "2026-11-16"
     },
     {
@@ -22,7 +22,7 @@
     "airbnb": {
       "label": "Airbnb",
       "ok": true,
-      "events": 2
+      "events": 3
     },
     "booking": {
       "label": "Booking.com",
