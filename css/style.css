@@ -2031,6 +2031,7 @@ ul { list-style: none; }
 .delay-2 { transition-delay: 0.2s; }
 .delay-3 { transition-delay: 0.3s; }
 .delay-4 { transition-delay: 0.4s; }
+.delay-5 { transition-delay: 0.5s; }
 
 /* ── RESPONSIVE: see mobile.css ────────────────────── */
 
